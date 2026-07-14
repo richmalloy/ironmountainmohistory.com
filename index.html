@@ -96,6 +96,31 @@
     color: var(--oxide);
   }
 
+  /* ---------- Photo plate ---------- */
+  .plate {
+    margin: 3rem auto 0;
+    max-width: 700px;
+  }
+  .plate img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--foxing);
+    outline: 6px solid var(--paper-deep);
+    outline-offset: 6px;
+    filter: sepia(0.25) contrast(1.02);
+  }
+  .plate figcaption {
+    margin-top: 1.4rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    text-align: center;
+  }
+  .plate figcaption .status { color: var(--oxide); font-weight: 700; }
+
   /* ---------- Intro ---------- */
   .intro {
     padding: 3rem 0 1rem;
@@ -355,6 +380,11 @@
 </header>
 
 <main class="wrap">
+
+  <figure class="plate">
+    <img src="/images/ozark-ore-plant.jpg" width="772" height="376" alt="The Ozark Ore Company surface plant at Iron Mountain, Missouri: the headframe at left beside the mill buildings, a tall water tower at center, and ore piles in the foreground, photographed in the mid-twentieth century.">
+    <figcaption><span class="status">Plate I</span> · The surface plant in the Ozark Ore years — headframe, mill &amp; water tower · real-photo postcard, date under research</figcaption>
+  </figure>
 
   <div class="intro">
     <p class="drop">Iron Mountain was never the solid mass of ore the old promotional literature claimed — but the ore was real, the mine was real, and the people who worked it were real. This site collects what the documentary record actually supports: military records, period newspapers, state mine maps, and the physical evidence still standing on the ground.</p>
