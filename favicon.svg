@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- ledger paper field -->
+  <rect width="64" height="64" rx="8" fill="#EFE6D0"/>
+  <!-- Big Mountain: solid iron oxide -->
+  <path d="M6 50 L28 14 L46 50 Z" fill="#8A3B1E"/>
+  <!-- Little Mountain: outline only — mined away -->
+  <path d="M38 50 L50 30 L60 50" fill="none" stroke="#8A3B1E" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="4 3"/>
+  <!-- baseline -->
+  <rect x="4" y="50" width="56" height="2.5" fill="#2B2118"/>
+</svg>
