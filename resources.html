@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resources — Iron Mountain, Missouri</title>
+<meta name="description" content="Publications, archives, maps, and repositories behind the documentary history of the Iron Mountain, Missouri mine property — with links to free digitized copies.">
+<link rel="icon" href="/favicon.png" type="image/png" sizes="64x64">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<script defer src="https://cloud.umami.is/script.js" data-website-id="137983b3-617d-41d9-9a9a-8e05851d4a97"></script>
+<style>
+  :root {
+    --paper: #EFE6D0;
+    --paper-deep: #E4D7BB;
+    --foxing: #C9B68C;
+    --ink: #2B2118;
+    --ink-faded: #5C4F3F;
+    --oxide: #8A3B1E;
+    --survey-blue: #35526B;
+    --cable: #6B5B45;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation: none !important; transition: none !important; }
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 1.15rem;
+    line-height: 1.65;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(201,182,140,0.25), transparent 55%),
+      radial-gradient(ellipse at 85% 90%, rgba(201,182,140,0.30), transparent 50%);
+  }
+
+  a { color: var(--survey-blue); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  a:hover { color: var(--oxide); }
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--oxide);
+    outline-offset: 3px;
+  }
+
+  .wrap {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  /* ---------- Masthead ---------- */
+  header {
+    padding: 4.5rem 0 3rem;
+    border-bottom: 3px double var(--foxing);
+  }
+
+  .eyebrow {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    margin-bottom: 1.25rem;
+  }
+
+  h1 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: clamp(2.6rem, 7vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+  }
+
+  .subtitle {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: clamp(1.15rem, 3vw, 1.45rem);
+    color: var(--ink-faded);
+    margin-top: 1rem;
+    max-width: 34em;
+  }
+
+  .masthead-rule {
+    margin-top: 2.25rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--oxide);
+  }
+
+  /* ---------- Photo plate ---------- */
+  .plate {
+    margin: 3rem auto 0;
+    max-width: 700px;
+  }
+  #plates .plate + .plate { margin-top: 4.5rem; }
+  .plate img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--foxing);
+    outline: 6px solid var(--paper-deep);
+    outline-offset: 6px;
+    filter: sepia(0.25) contrast(1.02);
+  }
+  .plate figcaption {
+    margin-top: 1.4rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    text-align: center;
+  }
+  .plate figcaption .status { color: var(--oxide); font-weight: 700; }
+
+  /* ---------- Intro ---------- */
+  .intro {
+    padding: 3rem 0 1rem;
+    max-width: 40em;
+  }
+  .intro p + p { margin-top: 1.1em; }
+  .intro .drop::first-letter {
+    font-family: 'IM Fell English', serif;
+    font-size: 3.4em;
+    float: left;
+    line-height: 0.8;
+    padding-right: 0.09em;
+    padding-top: 0.06em;
+    color: var(--oxide);
+  }
+
+  /* ---------- Section headings ---------- */
+  section { padding: 3.5rem 0 1rem; }
+
+  h2 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: clamp(1.7rem, 4vw, 2.3rem);
+    margin-bottom: 0.4rem;
+  }
+
+  .section-note {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    margin-bottom: 2.5rem;
+  }
+
+  /* ---------- Timeline: the hoist cable ---------- */
+  .timeline {
+    position: relative;
+    margin-left: 0.5rem;
+    padding-left: 2.5rem;
+  }
+
+  .timeline::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: repeating-linear-gradient(
+      to bottom,
+      var(--cable) 0px,
+      var(--cable) 14px,
+      transparent 14px,
+      transparent 18px
+    );
+  }
+
+  .cable-head {
+    position: absolute;
+    left: -14px;
+    top: -34px;
+    color: var(--cable);
+  }
+
+  /* era markers along the cable */
+  .era-marker {
+    position: relative;
+    margin: 3.5rem 0 2.25rem;
+    padding: 0.65rem 0 0.65rem 1rem;
+    border-left: 4px solid var(--oxide);
+    background: linear-gradient(to right, rgba(228,215,187,0.9), transparent 85%);
+    max-width: 38em;
+  }
+  .timeline .era-marker:first-of-type { margin-top: 0; }
+  .era-marker::before {
+    content: "";
+    position: absolute;
+    left: -2.5rem;
+    top: 50%;
+    width: 19px;
+    height: 19px;
+    margin-left: -8px;
+    margin-top: -10px;
+    background: var(--oxide);
+    transform: rotate(45deg);
+  }
+  .era-marker .era-num {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--oxide);
+    display: block;
+  }
+  .era-marker h3 {
+    font-family: 'IM Fell English SC', serif;
+    font-weight: 400;
+    font-size: 1.45rem;
+    line-height: 1.2;
+  }
+  .era-marker .era-note {
+    font-family: 'IM Fell English', serif;
+    font-style: italic;
+    font-size: 1.02rem;
+    color: var(--ink-faded);
+  }
+
+  .entry {
+    position: relative;
+    margin-bottom: 3rem;
+    max-width: 38em;
+  }
+
+  .entry::before {
+    content: "";
+    position: absolute;
+    left: -2.5rem;
+    top: 0.55rem;
+    width: 13px;
+    height: 13px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 3px solid var(--oxide);
+  }
+
+  .entry-date {
+    font-family: 'Courier Prime', monospace;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.1em;
+    color: var(--oxide);
+    text-transform: uppercase;
+  }
+
+  .entry h4 {
+    font-family: 'IM Fell English', serif;
+    font-weight: 400;
+    font-size: 1.45rem;
+    margin: 0.2rem 0 0.5rem;
+    line-height: 1.25;
+  }
+
+  .entry p + p { margin-top: 0.8em; }
+
+  .source-tag {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--foxing);
+    background: var(--paper-deep);
+    color: var(--ink-faded);
+  }
+  .source-tag .status { color: var(--oxide); font-weight: 700; }
+  .source-tag.open .status { color: var(--survey-blue); }
+  .source-tag.secondary .status { color: var(--ink-faded); }
+
+  /* ---------- Landmarks ---------- */
+  .landmarks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .card {
+    border: 1px solid var(--foxing);
+    background: var(--paper-deep);
+    padding: 1.5rem 1.5rem 1.25rem;
+    position: relative;
+  }
+  .card::after {
+    content: "";
+    position: absolute;
+    top: 0; right: 0;
+    border-style: solid;
+    border-width: 0 16px 16px 0;
+    border-color: transparent var(--paper) transparent transparent;
+  }
+
+  .card h3 {
+    font-family: 'IM Fell English', serif;
+    font-weight: 400;
+    font-size: 1.35rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .card p { font-size: 1.02rem; }
+
+  .status-chip {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink-faded);
+    padding: 0.2rem 0.55rem;
+    display: inline-block;
+    margin-bottom: 0.9rem;
+  }
+  .status-chip.standing { background: var(--oxide); }
+  .status-chip.question { background: var(--survey-blue); }
+  .status-chip.identified { background: #4F6B3A; }
+
+  /* ---------- Open questions ---------- */
+  .ledger {
+    border-top: 1px solid var(--foxing);
+    border-bottom: 1px solid var(--foxing);
+  }
+  .ledger-row {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    gap: 1.25rem;
+    padding: 1.1rem 0;
+  }
+  .ledger-row + .ledger-row { border-top: 1px dashed var(--foxing); }
+  .ledger-row dt {
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--survey-blue);
+    padding-top: 0.25rem;
+  }
+  .ledger-row dd { max-width: 36em; }
+
+  @media (max-width: 540px) {
+    .ledger-row { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+
+  /* ---------- Footer ---------- */
+  footer {
+    margin-top: 4.5rem;
+    padding: 2.5rem 0 3.5rem;
+    border-top: 3px double var(--foxing);
+    font-family: 'Courier Prime', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    color: var(--ink-faded);
+  }
+  footer p + p { margin-top: 0.5em; }
+</style>
+
+<style>
+  .res { border: 1px solid var(--foxing); background: rgba(255,255,255,0.25); padding: 1.1rem 1.25rem; margin: 0 0 1rem; }
+  .res h3 { font-family: 'Crimson Pro', Georgia, serif; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.3rem; }
+  .res p { font-size: 1rem; color: var(--ink-faded); }
+  .res .how { font-family: 'Courier Prime', monospace; font-size: 0.82rem; color: var(--survey-blue); display: block; margin-top: 0.5rem; }
+  .backlink { font-family: 'Courier Prime', monospace; font-size: 0.85rem; letter-spacing: 0.08em; }
+  main section { margin: 3rem 0; }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">Iron Mountain, Missouri — A Documentary History</p>
+    <h1>Resources</h1>
+    <p class="subtitle">The publications, archives, and repositories behind this history — with links to free digitized copies where they exist. Anyone wishing to check this project's claims, or carry the research further, should begin here.</p>
+    <p class="backlink" style="margin-top:1.5rem"><a href="/">&larr; Return to the history</a></p>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h2>The Shelf — Key Publications</h2>
+
+    <div class="res">
+      <h3>Nason, F.L. — <em>A Report on the Iron Ores of Missouri</em> (Missouri Geological Survey, 1892)</h3>
+      <p>The great nineteenth-century survey of the state's iron deposits, with detailed description of the Iron Mountain workings, including the Little Mountain open cut.</p>
+      <span class="how">Free: digitized on the Internet Archive (archive.org) — search the title.</span>
+    </div>
+
+    <div class="res">
+      <h3>Crane, G.W. — <em>The Iron Ores of Missouri</em> (Missouri Bureau of Geology &amp; Mines, 2nd Series Vol. X, 1912)</h3>
+      <p>The definitive early-twentieth-century treatment; source of the Big and Little Mountains topographic plate held in the state mine map repository.</p>
+      <span class="how">Free: digitized in the Missouri DNR/MGS online library at share.mo.gov — search the title.</span>
+    </div>
+
+    <div class="res">
+      <h3>Hayes, W.C., Jr. — <em>Geology and Exploration of Missouri Iron Deposits</em> (MGS Misc. Publication MP-017, 1959)</h3>
+      <p>By the state geologist whose surname may attach to Hayes Cut; his 1951 doctorate treated Missouri's Precambrian iron deposits.</p>
+      <span class="how">Free: <a href="https://share.mo.gov/nr/mgs/mgsdata/miscellaneous%20publications/geology%20and%20exploration%20of%20missouri%20iron%20deposits/mp-017.pdf">PDF at share.mo.gov</a></span>
+    </div>
+
+    <div class="res">
+      <h3>Hayes, W.C., Jr. (chairman) — <em>Guidebook to the Geology of the St. Francois Mountain Area</em> (MGS Report of Investigations No. 26, October 1961)</h3>
+      <p>Contains Murphy &amp; Mejia's "Underground Geology at Iron Mountain" — the company geologists' own account, the earliest known appearance of "Hayes Cut" in print, and the 1961 surface map naming the Hayes, Big, and Newman cuts.</p>
+      <span class="how">Digitized on HathiTrust (hathitrust.org) — search the title; page-by-page download available.</span>
+    </div>
+
+    <div class="res">
+      <h3>Kisvarsanyi, Hebrank &amp; Ryan — <em>Guidebook to the Geology and Ore Deposits of the St. Francois Mountains, Missouri</em> (MGS RI-67, 1981)</h3>
+      <p>The successor guidebook, co-authored by a Hanna Mining Company geologist; Iron Mountain is treated in Road Log No. 2.</p>
+      <span class="how">Free: <a href="https://share.mo.gov/nr/mgs/MGSData/Books/Reports%20of%20Investigations/Guidebook%20to%20the%20Geology%20and%20Ore%20Deposits%20of%20the%20St.%20Francois%20Mountains,%20Missouri/RI-067.pdf">PDF at share.mo.gov</a></span>
+    </div>
+
+    <div class="res">
+      <h3>Murphy, J.E. &amp; Ohle, E.L. — "The Iron Mountain Mine," in <em>Ore Deposits of the United States 1933&ndash;1967</em> (AIME, 1968)</h3>
+      <p>The closing-era company account of the deposit and mine, by the geologist whose signature appears on the 1961&ndash;62 company map series.</p>
+      <span class="how">Access: OneMine.org (membership) or university &amp; MGS Rolla libraries holding AIME volumes.</span>
+    </div>
+
+    <div class="res">
+      <h3><em>Mining and Exploration History of the Southeast Missouri Iron Metallogenic Province</em></h3>
+      <p>Modern scholarly history of the district, drawing on the Missouri Geological Survey photo archives — including a period photograph of the abandoned Big Cut, early 1900s.</p>
+      <span class="how">Available via ResearchGate (researchgate.net) — search the title.</span>
+    </div>
+
+    <div class="res">
+      <h3>Edgar, Judge William R. — "History of Iron Mountain" (local history, ca. 1940s)</h3>
+      <p>The richest narrative account of the property: the Pratte grant, Missouri City, company-town life, the Little Mountain cut, the water system, the Smollinger race track, and the Busby&ndash;Hanna revival. The same collection preserves the <em>Lead Belt News</em> account of the September 1923 hoist house fire.</p>
+      <span class="how">Free: transcribed at <a href="https://sites.rootsweb.com/~mostfran/mine_history/iron_mountain.htm">RootsWeb — St. Francois County mining history</a></span>
+    </div>
+
+    <div class="res">
+      <h3>Miles, J. Tom — <em>Brief Authentic History of St. Francois County</em> (1935)</h3>
+      <p>County history with valuable detail on the 1848&ndash;1860 company town: payroll, wages, scrip, and the company hotel.</p>
+      <span class="how">Available through the State Historical Society of Missouri and county genealogical collections.</span>
+    </div>
+
+    <div class="res">
+      <h3>Geological Society of America — <em>Memorial to William Clifton Hayes, Jr. (1920&ndash;1991)</em></h3>
+      <p>Biography of Missouri's fourteenth state geologist — candidate namesake of Hayes Cut.</p>
+      <span class="how">Free: <a href="https://www.geosociety.org/documents/gsa/memorials/v23/Hayes-WC.pdf">PDF at geosociety.org</a></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>The Vaults — Archives &amp; Repositories</h2>
+
+    <div class="res">
+      <h3>Missouri Geological Survey — Mine Map Repository (Rolla)</h3>
+      <p>Holds sixty-three archived sheets of the Iron Mountain Mine, from an 1886 survey by mining engineer W.E. Potter to the Ozark Ore, Hanna Mining, and Midwest Ore working maps of 1961&ndash;62 — including the December 1961 "Surface Map Showing Plant Site."</p>
+      <span class="how">Index: <a href="https://dnrservices.mo.gov/geology/geosrv/geores/mine-maps/">dnrservices.mo.gov — mine maps</a> (township 35N-4E) &middot; High-resolution copies: 573-368-2100</span>
+    </div>
+
+    <div class="res">
+      <h3>Missouri State Archives — Union Provost Marshal Papers, 1861&ndash;1866</h3>
+      <p>Searchable index of more than 72,000 Civil War&ndash;era records: loyalty oaths, passes, arrests, and property claims — the place to seek named individuals at Iron Mountain during the federal occupation.</p>
+      <span class="how">Search: <a href="https://s1.sos.mo.gov/records/archives/archivesmvc/provost/">Missouri State Archives provost database</a> (County: Saint Francois)</span>
+    </div>
+
+    <div class="res">
+      <h3><em>The War of the Rebellion: Official Records</em></h3>
+      <p>The government compilation of Union and Confederate records. Series I, Vol. 3 covers the 1861 occupation era; Series I, Vol. 41 (four parts) covers Price's 1864 Missouri Expedition and the Iron Mountain Railroad garrisons.</p>
+      <span class="how">Free &amp; full-text searchable: <a href="https://collections.library.cornell.edu/moa_new/waro.html">Cornell — Making of America</a></span>
+    </div>
+
+    <div class="res">
+      <h3>National Park Service — Civil War Battle Units</h3>
+      <p>Unit service records compiled from Dyer's Compendium — source of the documented movement of the 25th Missouri Infantry to Iron Mountain, March 1863.</p>
+      <span class="how">Free: nps.gov/civilwar — Search Battle Units</span>
+    </div>
+
+    <div class="res">
+      <h3>State Historical Society of Missouri</h3>
+      <p>Mining company records, manuscript collections, county histories, and the Ramsay Place Name files (1928&ndash;45) — the best remaining hope for the origins of "Newman Cut" and "Blue John Cut."</p>
+      <span class="how">Guide: <a href="https://shsmo.org/research/guides/mining">shsmo.org — mining research guide</a></span>
+    </div>
+
+    <div class="res">
+      <h3>Historic aerial photography</h3>
+      <p>USDA/USGS flights of St. Francois County from the 1930s onward show the plant in operation; Google Earth's historical-imagery slider covers recent decades.</p>
+      <span class="how">USGS EarthExplorer (earthexplorer.usgs.gov) &middot; Google Earth &rarr; Historical Imagery</span>
+    </div>
+
+    <div class="res">
+      <h3>Mindat — Iron Mountain Mine locality</h3>
+      <p>Mineralogical record of the deposit (hematite, magnetite) with historic photographs, including an 1875 illustration and early-1900s mine crew images.</p>
+      <span class="how">Free: <a href="https://www.mindat.org/loc-44224.html">mindat.org — locality 44224</a></span>
+    </div>
+  </section>
+
+  <section>
+    <h2>A Caution — Two Look-Alikes</h2>
+    <p>Researchers of this property regularly collide with two unrelated namesakes. The <strong>Missouri Mines State Historic Site</strong> in Park Hills preserves a <em>lead</em>-mining operation with no connection to Iron Mountain's iron works — its images are frequently mislabeled as Iron Mountain online. And <strong>"Camp Iron Mountain"</strong> was a Second World War desert training camp in California, sometimes erroneously grafted onto this property's Civil War history. Neither belongs in the Iron Mountain, Missouri record.</p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Iron Mountain, Missouri — a public history project.</p>
+    <p class="backlink"><a href="/">&larr; Return to the history</a></p>
+    <p>Working document — corrections and leads welcome.</p>
+  </div>
+</footer>
+
+</body>
+</html>
