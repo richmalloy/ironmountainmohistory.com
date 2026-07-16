@@ -50,7 +50,7 @@
   <h2>THE 691 LEVEL</h2>
   <p>Six hundred and ninety-one feet below the hoist house collar. Mined 1944&ndash;1966; abandoned with the pumps off; flooded ever since. You are walking it as it was on a working day, by cap lamp — the pillars holding the roof are the mountain's own rock, left standing by the engineers. <br><br><em>Interpretive reconstruction from Map 00224 and the Hanna series — pillar layout stylized until the high-resolution scans are traced.</em></p>
   <button id="go">⛏ &nbsp;BOARD THE CAGE</button>
-  <div class="keys">DESKTOP: click to look · W/↑ walk · ←→ turn · A D strafe · ESC to release mouse<br>MOBILE: drag to look · hold WALK to move</div>
+  <div class="keys">DESKTOP: click the view to take the controls (ESC releases) · W/↑ walk · ←→ turn · A D strafe<br>MOBILE: drag to look · hold WALK to move</div>
 </div>
 
 <div id="hud" class="panel">
@@ -75,6 +75,7 @@
   </div>
 </div>
 <button id="walkbtn">WALK</button>
+<div id="hint" class="panel" style="bottom:64px;left:50%;transform:translateX(-50%);padding:6px 14px;font-family:monospace;font-size:10px;color:#c9a06b;letter-spacing:.12em;display:none">CLICK THE VIEW TO TAKE THE CONTROLS · ESC RELEASES</div>
 
 <script>
 const canvas=document.getElementById('c');
@@ -208,6 +209,7 @@ const drops=new THREE.Points(
 scene.add(drops);
 
 // ---------- the shaft & the descent ----------
+let lampScale=1;
 const DESC_TOP=64;                       // visual shaft height above the level
 const tube=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,DESC_TOP+4,10,1,true),
   new THREE.MeshLambertMaterial({map:rockT,side:THREE.BackSide}));
@@ -233,6 +235,25 @@ LEVELS_ABOVE.forEach(d=>{
   ring.rotation.x=Math.PI/2; ring.position.set(stationX,depthToY(d),stationZ); scene.add(ring);
   shaftTag(d+"′ LEVEL", depthToY(d));
 });
+// --- daylight at the collar ---
+const skyDisk=new THREE.Mesh(new THREE.CircleGeometry(3.3,20),
+  new THREE.MeshBasicMaterial({color:0xcfe4f5,fog:false}));
+skyDisk.rotation.x=Math.PI/2; skyDisk.position.set(stationX,DESC_TOP+3.4,stationZ); scene.add(skyDisk);
+// headframe legs over the collar, seen from below in daylight
+[[-2.6,-2.6],[2.6,-2.6],[-2.6,2.6],[2.6,2.6]].forEach(p=>{
+  const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.2,14,6),
+    new THREE.MeshLambertMaterial({color:0x6e4438}));
+  leg.position.set(stationX+p[0]*0.55,DESC_TOP+9,stationZ+p[1]*0.55); scene.add(leg);});
+const dayLight=new THREE.PointLight(0xeaf2ff,1.4,50);
+dayLight.position.set(stationX,DESC_TOP+2,stationZ); scene.add(dayLight);
+const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
+function applyDepthAtmosphere(){
+  const f=Math.max(0,Math.min(1,(DESC_TOP-camera.position.y)/(DESC_TOP-EYE)));
+  const c=SKY.clone().lerp(CAVE, Math.min(1,f*1.6));
+  scene.background.copy(c); scene.fog.color.copy(c);
+  scene.fog.density=0.004+ (0.028/Math.sqrt(lampScale)-0.004)*f;
+  dayLight.intensity=1.4*(1-f);
+}
 let descending=false, descY=DESC_TOP;
 const dft=document.getElementById('dft'), dlv=document.getElementById('dlv');
 function updateDepthHUD(){
@@ -247,7 +268,6 @@ function updateDepthHUD(){
 }
 
 // ---------- lamp brightness control ----------
-let lampScale=1;
 document.getElementById('lamprange').oninput=e=>{
   lampScale=e.target.value/100;
   scene.fog.density=0.028/Math.sqrt(lampScale);
@@ -256,14 +276,16 @@ document.getElementById('lamprange').oninput=e=>{
 // ---------- first-person controls ----------
 let yaw=Math.PI, pitch=0, locked=false;
 const startEl=document.getElementById('start');
+let holdUntil=0;
 document.getElementById('go').onclick=()=>{
   startEl.style.display='none';
-  descending=true;
+  document.getElementById('hint').style.display='block';
+  descending=true; holdUntil=performance.now()+1800;   // a breath of daylight first
   camera.position.set(stationX,DESC_TOP,stationZ);
-  yaw=Math.PI; pitch=-0.15;
-  if(matchMedia('(pointer:fine)').matches) canvas.requestPointerLock();
+  yaw=Math.PI; pitch=0.35;                              // looking UP at the sky
 };
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;});
+document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;
+  document.getElementById('hint').style.display = locked?'none':'block';});
 canvas.addEventListener('click',()=>{ if(!locked && startEl.style.display==='none' && matchMedia('(pointer:fine)').matches) canvas.requestPointerLock(); });
 addEventListener('mousemove',e=>{
   if(!locked) return;
@@ -348,10 +370,14 @@ function animate(t){
   requestAnimationFrame(animate); resize();
   const dt=Math.min(0.05,(t-last)/1000||0.016); last=t;
   if(descending){
-    camera.position.y-=dt*4.6;                       // the cage drops
+    if(performance.now()>holdUntil){
+      camera.position.y-=dt*4.6;                     // the cage drops
+      if(pitch>-0.05) pitch-=dt*0.25;                // gaze settles level as you sink
+    }
     camera.position.x=stationX; camera.position.z=stationZ;
     if(camera.position.y<=EYE){ camera.position.y=EYE; descending=false; }
   } else if(startEl.style.display==='none') move(dt);
+  applyDepthAtmosphere();
   updateDepthHUD();
   camera.rotation.set(0,0,0);
   camera.rotateY(yaw); camera.rotateX(pitch);
