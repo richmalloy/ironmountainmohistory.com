@@ -27,7 +27,9 @@
 <body>
 <canvas id="c"></canvas>
 
+<button id="info" class="panel" style="top:12px;left:12px;display:none;padding:6px 11px;color:#d9a06b;font-family:monospace;font-size:14px;cursor:pointer">ⓘ</button>
 <div id="hud" class="panel">
+  <button id="hudx" style="float:right;background:none;border:none;color:#8b949c;font-size:16px;cursor:pointer;padding:0 2px;line-height:1">×</button>
   <h1>IRON MOUNTAIN</h1>
   <div class="sub">Time Explorer &middot; v0.2 &middot; interpretive</div>
   <div style="margin:6px 0 2px"><a href="/">&larr; RETURN TO THE HISTORY</a></div>
@@ -280,6 +282,9 @@ let playing=false; const playBtn=document.getElementById('play');
 playBtn.onclick=()=>{playing=!playing;playBtn.textContent=playing?'⏸ PAUSE':'▶ PLAY';
   if(playing && +slider.value>=2026) slider.value=1840;};
 setYear(1846);
+
+document.getElementById('hudx').onclick=()=>{document.getElementById('hud').style.display='none';document.getElementById('info').style.display='block';};
+document.getElementById('info').onclick=()=>{document.getElementById('hud').style.display='block';document.getElementById('info').style.display='none';};
 
 // ---------- controls ----------
 let sph=new THREE.Spherical().setFromVector3(camera.position.clone().sub(target));
