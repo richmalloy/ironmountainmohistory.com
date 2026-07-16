@@ -69,14 +69,15 @@
   LAMP <input type="range" id="lamprange" min="40" max="260" value="100" style="width:110px;vertical-align:middle;accent-color:#ffb26b">
 </div>
 <div id="mapwrap" class="panel" style="top:56px;right:12px;padding:8px">
-  <div style="font-family:monospace;font-size:9px;letter-spacing:.14em;color:#9fb2bd;margin-bottom:5px;text-align:center">LEVEL PLAN — 691′</div>
+  <div style="font-family:monospace;font-size:9px;letter-spacing:.14em;color:#9fb2bd;margin-bottom:5px;text-align:center">691′ LEVEL — MGS MAP 00649</div>
   <canvas id="minimap" width="180" height="180" style="display:block"></canvas>
   <div style="font-family:monospace;font-size:8.5px;color:#8b949c;margin-top:5px;line-height:1.7">
     <span style="color:#bfd8ff">■</span> SHAFT STATION&nbsp;
     <span style="color:#d9a06b">■</span> ORE CAR<br>
     <span style="color:#c98a4a">■</span> CHUTE&nbsp;
     <span style="color:#a9a9b0">■</span> DRILL STEEL&nbsp;
-    <span style="color:#ffb26b">▲</span> YOU
+    <span style="color:#ffb26b">▲</span> YOU<br>
+    <span style="color:#6f7880">Hanna Mining Co., Nov. 1963 — position approximate</span>
   </div>
 </div>
 <button id="walkbtn">WALK</button>
@@ -518,24 +519,29 @@ function move(dt,surface){
 let bob=0;
 
 const mm=document.getElementById('minimap').getContext('2d');
+// the real level plan: MGS Map 00649 (Hanna Mining Co., Nov. 1963), cropped to the Main Orebody
+// workings. Registered at the shaft; the interpretive room is mapped onto it approximately.
+const mapImg=new Image(); let mapReady=false;
+mapImg.onload=()=>mapReady=true; mapImg.src='/images/level691-guide.jpg';
+const MMX=88.6, MMY=122.9, MMK=0.483;   // shaft pixel + units->px on the 180px canvas
+function m2c(x,z){ return [MMX+x*MMK, MMY+(z-stationZ)*MMK]; }
 const LM=[[0,58,'#bfd8ff'],[0,-14,'#d9a06b'],[-34,-30,'#c98a4a'],[30,22,'#a9a9b0']];
 function drawMap(){
-  const S=180, sc=S/(ROOM*2.15), cx=S/2, cy=S/2;
+  const S=180;
   mm.clearRect(0,0,S,S);
-  // room
-  mm.beginPath(); mm.arc(cx,cy,ROOM*sc,0,7);
-  mm.fillStyle='rgba(20,26,30,0.9)'; mm.fill();
-  mm.strokeStyle='#3d5866'; mm.lineWidth=1.5; mm.stroke();
-  // pillars
-  mm.fillStyle='#4a423a';
-  for(const p of pillars){
-    mm.beginPath(); mm.arc(cx+p.x*sc, cy+p.z*sc, Math.max(1.2,p.r*sc*0.8),0,7); mm.fill();
+  if(mapReady){
+    mm.drawImage(mapImg,0,0,S,S);
+    mm.fillStyle='rgba(8,12,16,0.16)'; mm.fillRect(0,0,S,S);   // dim to sit in the dark UI
+  }else{
+    mm.beginPath(); mm.arc(S/2,S/2,80,0,7);
+    mm.fillStyle='rgba(20,26,30,0.9)'; mm.fill();
+    mm.strokeStyle='#3d5866'; mm.lineWidth=1.5; mm.stroke();
   }
   // landmarks
-  for(const l of LM){ mm.fillStyle=l[2]; mm.fillRect(cx+l[0]*sc-2.5, cy+l[1]*sc-2.5, 5,5); }
+  for(const l of LM){ const c=m2c(l[0],l[1]); mm.fillStyle=l[2]; mm.fillRect(c[0]-2.5,c[1]-2.5,5,5); }
   // player arrow (heading = yaw)
-  const px=cx+camera.position.x*sc, pz=cy+camera.position.z*sc;
-  mm.save(); mm.translate(px,pz); mm.rotate(-yaw+Math.PI);
+  const pc=m2c(camera.position.x,camera.position.z);
+  mm.save(); mm.translate(pc[0],pc[1]); mm.rotate(-yaw+Math.PI);
   mm.fillStyle='#ffb26b';
   mm.beginPath(); mm.moveTo(0,-6); mm.lineTo(4,5); mm.lineTo(-4,5); mm.closePath(); mm.fill();
   mm.restore();
