@@ -273,11 +273,18 @@ const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
 // hoist room: the taller end, nearest the shaft
 const hb1=new THREE.Mesh(new THREE.BoxGeometry(12,5.6,8),brickM); hb1.position.set(0,2.8,0); hhouse.add(hb1);
 // office wing: LONG (per the Weber-era aerial) — one continuous building
-const hb2=new THREE.Mesh(new THREE.BoxGeometry(46,4.6,7.4),brickM); hb2.position.set(-29,2.3,0); hhouse.add(hb2);
-const hr1=new THREE.Mesh(new THREE.BoxGeometry(13,0.7,9),new THREE.MeshLambertMaterial({color:0x5a4a44}));
+const hb2=new THREE.Mesh(new THREE.BoxGeometry(58,4.6,7.4),brickM); hb2.position.set(-35,2.3,0); hhouse.add(hb2);
+const roofM=new THREE.MeshLambertMaterial({color:0x6e3a34});   // the red metal roof
+const hr1=new THREE.Mesh(new THREE.BoxGeometry(13,0.7,9),roofM);
 hr1.position.set(0,6.1,0); hhouse.add(hr1);
-const hr2=new THREE.Mesh(new THREE.BoxGeometry(47,0.7,8.4),new THREE.MeshLambertMaterial({color:0x5a4a44}));
-hr2.position.set(-29,5.3,0); hhouse.add(hr2);
+const hr2=new THREE.Mesh(new THREE.BoxGeometry(59,0.7,8.4),roofM);
+hr2.position.set(-35,5.3,0); hhouse.add(hr2);
+// windows along the office wing (the photo's arched run, simplified)
+for(let i=0;i<9;i++){
+  const w=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,0.15),
+    new THREE.MeshLambertMaterial({color:0x2a3138}));
+  w.position.set(-10-i*6,2.6,3.75); hhouse.add(w);
+}
 hhouse.position.set(stationX-24,SURF,stationZ); scene.add(hhouse);
 function srope(x1,y1,z1,x2,y2,z2){
   const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
@@ -285,14 +292,14 @@ function srope(x1,y1,z1,x2,y2,z2){
     new THREE.MeshBasicMaterial({color:0xd8d0c0}));
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-srope(stationX-18,SURF+5,stationZ-0.8, stationX,SURF+15.4,stationZ-0.8);
-srope(stationX-18,SURF+5,stationZ+0.8, stationX,SURF+15.4,stationZ+0.8);
+srope(stationX-21,SURF+4.9,stationZ-0.8, stationX,SURF+15.4,stationZ-0.8);
+srope(stationX-21,SURF+4.9,stationZ+0.8, stationX,SURF+15.4,stationZ+0.8);
 const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
  const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle='#efe6d0';
  g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
  g.fillText('THE HOIST HOUSE & OFFICE — the ropes run from here',14,100);
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
- sp.scale.set(22,4.3,1);sp.position.set(stationX-40,SURF+10,stationZ);scene.add(sp);return sp;})();
+ sp.scale.set(22,4.3,1);sp.position.set(stationX-50,SURF+10,stationZ);scene.add(sp);return sp;})();
 const dayLight=new THREE.PointLight(0xeaf2ff,1.4,50);
 dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
@@ -341,13 +348,22 @@ for(let i=0;i<LPATH.length;i++){
 // ---------- first-person controls ----------
 let yaw=Math.PI, pitch=0;
 const startEl=document.getElementById('start');
+// pulsing beacon at the collar — the objective
+const beacon=new THREE.Mesh(new THREE.TorusGeometry(3.9,0.16,6,24),
+  new THREE.MeshBasicMaterial({color:0xffb26b,transparent:true,opacity:0.9}));
+beacon.rotation.x=Math.PI/2; beacon.position.set(stationX,SURF+0.25,stationZ); scene.add(beacon);
+const goTag=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
+ const g=c.getContext('2d');g.font='600 44px monospace';g.fillStyle='#ffb26b';
+ g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=10;
+ g.fillText('⛏ THE SHAFT — walk to the cage',14,100);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+ sp.scale.set(20,3.9,1);sp.position.set(stationX,SURF+18.5,stationZ);scene.add(sp);return sp;})();
 let atSurface=false;
 document.getElementById('go').onclick=()=>{
   startEl.style.display='none';
   atSurface=true;
-  camera.position.set(stationX+8,SURF+EYE,stationZ+6);
-  yaw=1.32; pitch=0.02;                                 // facing the hoist house across the yard
-  document.getElementById('lower').style.display='block';
+  camera.position.set(stationX-24,SURF+EYE,stationZ+32); // in the yard, the photo's vantage
+  yaw=-0.12; pitch=0.02;                                 // the long building ahead, headframe to the right
   document.getElementById('hint').style.display='block';
 };
 document.getElementById('lower').onclick=()=>{
@@ -385,7 +401,7 @@ const wb=document.getElementById('walkbtn');
 wb.addEventListener('touchstart',e=>{walkHold=true;e.preventDefault();},{passive:false});
 wb.addEventListener('touchend',()=>walkHold=false);
 
-function move(dt){
+function move(dt,surface){
   const speed=7.5*dt;
   // arrow left/right TURN the view; A/D strafe
   const turn=((keys.ArrowLeft)?1:0)-((keys.ArrowRight)?1:0);
@@ -396,19 +412,21 @@ function move(dt){
   fx+=Math.sin(yaw)* -f + Math.cos(yaw)*st;
   fz+=Math.cos(yaw)* -f - Math.sin(yaw)*st;
   let nx=camera.position.x+fx*speed, nz=camera.position.z+fz*speed;
-  // collide with pillars
-  for(const p of pillars){
-    const d=Math.hypot(nx-p.x,nz-p.z);
-    if(d<p.r){ const push=(p.r-d); nx+=(nx-p.x)/d*push; nz+=(nz-p.z)/d*push; }
+  if(!surface){
+    // collide with pillars (underground only)
+    for(const p of pillars){
+      const d=Math.hypot(nx-p.x,nz-p.z);
+      if(d<p.r){ const push=(p.r-d); nx+=(nx-p.x)/d*push; nz+=(nz-p.z)/d*push; }
+    }
+    // stay in the room
+    const rr=Math.hypot(nx,nz);
+    if(rr>ROOM-3){ nx*= (ROOM-3)/rr; nz*=(ROOM-3)/rr; }
   }
-  // stay in the room
-  const rr=Math.hypot(nx,nz);
-  if(rr>ROOM-3){ nx*= (ROOM-3)/rr; nz*=(ROOM-3)/rr; }
   camera.position.x=nx; camera.position.z=nz;
   // head bob
   const moving=Math.abs(f)+Math.abs(st)>0;
   bob+= moving? dt*9:0;
-  camera.position.y=EYE + (moving? Math.sin(bob)*0.05:0);
+  camera.position.y=(surface?SURF+EYE:EYE) + (moving? Math.sin(bob)*0.05:0);
 }
 let bob=0;
 
@@ -447,7 +465,29 @@ function animate(t){
     if(pitch>-0.05) pitch-=dt*0.22;                  // gaze settles level as you sink
     camera.position.x=stationX; camera.position.z=stationZ;
     if(camera.position.y<=EYE){ camera.position.y=EYE; descending=false; }
-  } else if(!atSurface && startEl.style.display==='none') move(dt);
+  } else if(startEl.style.display==='none'){
+    if(atSurface){
+      move(dt,true);
+      let nx=camera.position.x, nz=camera.position.z;
+      // the long building is solid: x:[stationX-66,stationX+8.5], z:[stationZ±5.6]
+      if(nx>stationX-66&&nx<stationX+8.5&&nz>stationZ-5.6&&nz<stationZ+5.6){
+        nz = (nz<stationZ)? stationZ-5.6 : stationZ+5.6;
+      }
+      // don't fall in the shaft before taking the cage
+      let ds=Math.hypot(nx-stationX,nz-stationZ);
+      if(ds<4.2){ nx=stationX+(nx-stationX)/ds*4.2; nz=stationZ+(nz-stationZ)/ds*4.2; ds=4.2; }
+      // yard boundary
+      const ry=Math.hypot(nx-stationX,nz-stationZ);
+      if(ry>66){ nx=stationX+(nx-stationX)/ry*66; nz=stationZ+(nz-stationZ)/ry*66; }
+      camera.position.x=nx; camera.position.z=nz;
+      // arrival at the cage
+      const arrived = ds<7;
+      document.getElementById('lower').style.display = arrived?'block':'none';
+      beacon.visible=!arrived; goTag.visible=!arrived;
+      beacon.material.opacity=0.55+Math.sin(t*0.006)*0.35;
+      beacon.scale.setScalar(1+Math.sin(t*0.004)*0.08);
+    } else move(dt);
+  }
   applyDepthAtmosphere();
   updateDepthHUD();
   camera.rotation.set(0,0,0);
