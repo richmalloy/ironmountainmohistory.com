@@ -104,18 +104,25 @@ const colL=label('BARE COLLAR — the idle years',4,'#8b949c'); colL.position.se
 // long brick building: hoist room (east end) + office/post office (west end)
 const brick=new THREE.MeshLambertMaterial({color:0x8a5040});
 const bldg=new THREE.Group();
-const hoistRoom=new THREE.Mesh(new THREE.BoxGeometry(16,8,11),brick); hoistRoom.position.set(-16,4,0); bldg.add(hoistRoom);
-const office=new THREE.Mesh(new THREE.BoxGeometry(22,7,10),brick); office.position.set(-35,3.5,0); bldg.add(office);
-// glass block band on the office (the Christmas window wall)
-const glass=new THREE.Mesh(new THREE.BoxGeometry(10,2.2,0.3),
+// one LONG lean building (per 2020 aerial): hoist room (taller, east end) + office wing, continuous
+const hoistRoom=new THREE.Mesh(new THREE.BoxGeometry(14,8.5,9),brick); hoistRoom.position.set(-13,4.25,0); bldg.add(hoistRoom);
+const office=new THREE.Mesh(new THREE.BoxGeometry(32,7,8.6),brick); office.position.set(-36,3.5,0); bldg.add(office);
+// glass block band (the Christmas window wall)
+const glass=new THREE.Mesh(new THREE.BoxGeometry(12,2.2,0.3),
  new THREE.MeshLambertMaterial({color:0xbfd8e8,emissive:0x224455}));
-glass.position.set(-35,4.5,5.2); bldg.add(glass);
-// roofs
-const r1=new THREE.Mesh(new THREE.BoxGeometry(17,0.8,12),new THREE.MeshLambertMaterial({color:0x5a4a44}));
-r1.position.set(-16,8.4,0); bldg.add(r1);
-const r2=new THREE.Mesh(new THREE.BoxGeometry(23,0.8,11),new THREE.MeshLambertMaterial({color:0x5a4a44}));
-r2.position.set(-35,7.4,0); bldg.add(r2);
-T(bldg,1951);
+glass.position.set(-36,4.5,4.5); bldg.add(glass);
+// gable roofs: gray era, then red metal (aerial) after 1997
+function gable(len,wid,x,y,color){
+ const g=new THREE.Mesh(new THREE.CylinderGeometry(wid*0.62,wid*0.62,len,3),
+  new THREE.MeshLambertMaterial({color}));
+ g.rotation.z=Math.PI/2; g.rotation.x=Math.PI; g.position.set(x,y,0); g.scale.y=1; return g;}
+const rGray1=gable(15,9,-13,9.4,0x5a4a44), rGray2=gable(33,8.6,-36,8.1,0x5a4a44);
+const rRed1 =gable(15,9,-13,9.4,0x7a2a28), rRed2 =gable(33,8.6,-36,8.1,0x7a2a28);
+bldg.add(rGray1,rGray2); T(bldg,1951);
+const redRoofs=new THREE.Group(); redRoofs.add(rRed1.clone(),rRed2.clone()); T(redRoofs,1997);
+// hide gray roofs in red era via timed overlay trick: gray roofs as separate timed group
+bldg.remove(rGray1); bldg.remove(rGray2);
+const grayRoofs=new THREE.Group(); grayRoofs.add(rGray1,rGray2); T(grayRoofs,1951,1997);
 const bL=label('BRICK HOIST HOUSE + OFFICE (P.O. until 1978)',4.2,'#e8c9a0'); bL.position.set(-26,12,9); T(bL,1951);
 
 // steel headframe over the shaft (east of / right of the house — per RM)
@@ -153,13 +160,15 @@ const ropeL=label('ROPES RUNNING — ore below',3.6,'#d8d0c0'); ropeL.position.s
 const endL=label('1966 — the ropes stop',4,'#8b949c'); endL.position.set(-4,22,-6); T(endL,1966,1970);
 
 // water towers east of headframe (extant)
-[[14,2.8,2.6,19],[20,-3,1.8,13]].forEach(t=>{   // [x,z,radius,height] — big tank notably TALL (per hero photo)
+[[14,2.8,2.8,24,true],[20,-3,1.9,9,false]].forEach(t=>{ // big tower rivals the headframe; small tank squat
  const grp=new THREE.Group();
- const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],4,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
+ const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],4.2,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
  tank.position.y=t[3]; grp.add(tank);
+ if(t[4]){ const cap=new THREE.Mesh(new THREE.ConeGeometry(t[2]*1.05,1.8,10),
+   new THREE.MeshLambertMaterial({color:0x6a4638})); cap.position.y=t[3]+3; grp.add(cap); }
  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
-  const lg=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.22,t[3]-2,5),steel);
-  lg.position.set(p[0]*t[2]*0.5,(t[3]-2)/2,p[1]*t[2]*0.5); grp.add(lg);});
+  const lg=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.24,t[3]-2,5),steel);
+  lg.position.set(p[0]*t[2]*0.55,(t[3]-2)/2,p[1]*t[2]*0.55); grp.add(lg);});
  grp.position.set(t[0],0,t[1]); T(grp,1951);
 });
 const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(17,19,0); T(wtL,1951);
@@ -181,16 +190,24 @@ const thL=label('THICKENER — mine-water clarifier',3.8,'#c9c2ae'); thL.positio
 const thL2=label('THICKENER — rock-filled at closure',3.8,'#9a998c'); thL2.position.set(-50,5,0); T(thL2,1968);
 
 // the MILL — tiered gravity mill ADJACENT to the headframe (per the Ozark Ore hero photo); burns 1978
-const millMat=new THREE.MeshLambertMaterial({color:0x7a6a55});
+const millMat=new THREE.MeshLambertMaterial({color:0x5f5346});
 const mill=new THREE.Group();
-const m1=new THREE.Mesh(new THREE.BoxGeometry(10,14,9),millMat); m1.position.set(0,7,0); mill.add(m1);      // headhouse tier
-const m2=new THREE.Mesh(new THREE.BoxGeometry(9,10,9),millMat);  m2.position.set(8.5,5,0); mill.add(m2);   // mid tier
-const m3=new THREE.Mesh(new THREE.BoxGeometry(9,6.5,9),millMat); m3.position.set(16.5,3.25,0); mill.add(m3);// lower tier
-const m4=new THREE.Mesh(new THREE.BoxGeometry(8,4,8),millMat);   m4.position.set(24,2,0); mill.add(m4);    // loadout
-[ [0,14.4],[8.5,10.4],[16.5,6.9],[24,4.4] ].forEach(p=>{
-  const rf=new THREE.Mesh(new THREE.BoxGeometry(10.5,0.6,9.5),new THREE.MeshLambertMaterial({color:0x4f463c}));
+// tall compact mill block (per hero photo): ~4 stories, dark, vertical
+const m1=new THREE.Mesh(new THREE.BoxGeometry(11,17,10),millMat); m1.position.set(0,8.5,0); mill.add(m1);
+const m2=new THREE.Mesh(new THREE.BoxGeometry(8,12,9),millMat);   m2.position.set(9,6,0);   mill.add(m2);
+const m3=new THREE.Mesh(new THREE.BoxGeometry(7,7,8),millMat);    m3.position.set(15.5,3.5,0); mill.add(m3);
+[[0,17.4,11.5],[9,12.4,8.5],[15.5,7.4,7.5]].forEach(p=>{
+  const rf=new THREE.Mesh(new THREE.BoxGeometry(p[2],0.6,10.2),new THREE.MeshLambertMaterial({color:0x453c33}));
   rf.position.set(p[0],p[1],0); mill.add(rf);});
+// the inclined ore-bridge conveyor descending from the mill top out over the stockpiles (hero's signature)
+const conv=new THREE.Mesh(new THREE.BoxGeometry(34,1.1,2.2),millMat);
+conv.position.set(20,10,4); conv.rotation.z=-0.42; conv.rotation.y=0.25; mill.add(conv);
 mill.position.set(6,0,-13); T(mill,1944,1978);
+// stockpiles under the conveyor's end (working era)
+[[40,-4,10,6],[50,-12,13,7.5],[33,-16,8,5]].forEach(p=>{
+  const sp=new THREE.Mesh(new THREE.ConeGeometry(p[2],p[3],9),
+    new THREE.MeshLambertMaterial({color:0x6e5a4c}));
+  sp.position.set(p[0],p[3]/2,p[1]); T(sp,1944,1980);});
 const millL=label('THE MILL — ore fed from the headframe, stepping down by gravity',3.9,'#c9c2ae'); millL.position.set(16,17,-13); T(millL,1944,1978);
 const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(14,12,-10); T(f78,1978,1982);
 // rail BEHIND the mill (per RM) with ore cars, loading out concentrates
