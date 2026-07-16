@@ -220,11 +220,18 @@ tube.position.set(stationX,(DESC_TOP+4)/2-1,stationZ); scene.add(tube);
 // level rings passing on the way down (depths above the 691, mapped into the tube)
 const LEVELS_ABOVE=[465,503,541,579,616,654];
 function depthToY(d){ return EYE + (1-d/691)*(DESC_TOP-EYE); }
+function shaftTag(text,y){
+  const c=document.createElement('canvas'); c.width=512; c.height=128;
+  const g=c.getContext('2d'); g.font='600 40px monospace'; g.fillStyle='#c9a06b';
+  g.textBaseline='middle'; g.shadowColor='#000'; g.shadowBlur=8; g.fillText(text,14,64);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+  sp.scale.set(8,2,1); sp.position.set(stationX+4.4,y,stationZ); scene.add(sp);
+}
 LEVELS_ABOVE.forEach(d=>{
   const ring=new THREE.Mesh(new THREE.TorusGeometry(3.2,0.12,6,14),
     new THREE.MeshBasicMaterial({color:0x6a5a44}));
   ring.rotation.x=Math.PI/2; ring.position.set(stationX,depthToY(d),stationZ); scene.add(ring);
-  const rl=label(d+"′ LEVEL",3.2,'#c9a06b'); rl.position.set(stationX+4.2,depthToY(d),stationZ); scene.add(rl);
+  shaftTag(d+"′ LEVEL", depthToY(d));
 });
 let descending=false, descY=DESC_TOP;
 const dft=document.getElementById('dft'), dlv=document.getElementById('dlv');
