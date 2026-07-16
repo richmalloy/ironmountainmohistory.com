@@ -269,25 +269,30 @@ const sdeck=new THREE.Mesh(new THREE.BoxGeometry(3.6,1.2,3.6),steelM);
 sdeck.position.set(stationX,SURF+15.4,stationZ); scene.add(sdeck);
 // the brick hoist house across the yard, ropes flying to the sheaves
 const hhouse=new THREE.Group();
-const hb=new THREE.Mesh(new THREE.BoxGeometry(14,5,8),new THREE.MeshLambertMaterial({color:0x8a5040}));
-hb.position.y=2.5; hhouse.add(hb);
-const hr=new THREE.Mesh(new THREE.BoxGeometry(15,0.7,9),new THREE.MeshLambertMaterial({color:0x5a4a44}));
-hr.position.y=5.4; hhouse.add(hr);
-hhouse.position.set(stationX-26,SURF,stationZ); scene.add(hhouse);
+const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
+// hoist room: the taller end, nearest the shaft
+const hb1=new THREE.Mesh(new THREE.BoxGeometry(12,5.6,8),brickM); hb1.position.set(0,2.8,0); hhouse.add(hb1);
+// office wing: LONG (per the Weber-era aerial) — one continuous building
+const hb2=new THREE.Mesh(new THREE.BoxGeometry(26,4.6,7.4),brickM); hb2.position.set(-19,2.3,0); hhouse.add(hb2);
+const hr1=new THREE.Mesh(new THREE.BoxGeometry(13,0.7,9),new THREE.MeshLambertMaterial({color:0x5a4a44}));
+hr1.position.set(0,6.1,0); hhouse.add(hr1);
+const hr2=new THREE.Mesh(new THREE.BoxGeometry(27,0.7,8.4),new THREE.MeshLambertMaterial({color:0x5a4a44}));
+hr2.position.set(-19,5.3,0); hhouse.add(hr2);
+hhouse.position.set(stationX-24,SURF,stationZ); scene.add(hhouse);
 function srope(x1,y1,z1,x2,y2,z2){
   const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
   const m=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,L,4),
     new THREE.MeshBasicMaterial({color:0xd8d0c0}));
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-srope(stationX-20,SURF+4.5,stationZ-0.8, stationX,SURF+15.4,stationZ-0.8);
-srope(stationX-20,SURF+4.5,stationZ+0.8, stationX,SURF+15.4,stationZ+0.8);
+srope(stationX-18,SURF+5,stationZ-0.8, stationX,SURF+15.4,stationZ-0.8);
+srope(stationX-18,SURF+5,stationZ+0.8, stationX,SURF+15.4,stationZ+0.8);
 const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
  const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle='#efe6d0';
  g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
- g.fillText('THE HOIST HOUSE — the drums are turning inside',14,100);
+ g.fillText('THE HOIST HOUSE & OFFICE — the ropes run from here',14,100);
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
- sp.scale.set(22,4.3,1);sp.position.set(stationX-26,SURF+9,stationZ);scene.add(sp);return sp;})();
+ sp.scale.set(22,4.3,1);sp.position.set(stationX-28,SURF+9.5,stationZ);scene.add(sp);return sp;})();
 const dayLight=new THREE.PointLight(0xeaf2ff,1.4,50);
 dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
