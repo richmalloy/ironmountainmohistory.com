@@ -33,7 +33,7 @@
   <h2>THE 691 LEVEL</h2>
   <p>Six hundred and ninety-one feet below the hoist house collar. Mined 1944&ndash;1966; abandoned with the pumps off; flooded ever since. You are walking it as it was on a working day, by cap lamp — the pillars holding the roof are the mountain's own rock, left standing by the engineers. <br><br><em>Interpretive reconstruction from Map 00224 and the Hanna series — pillar layout stylized until the high-resolution scans are traced.</em></p>
   <button id="go">⛏ &nbsp;LIGHT THE LAMP</button>
-  <div class="keys">DESKTOP: click to look · W A S D / arrows to walk · ESC to release mouse<br>MOBILE: drag to look · hold WALK to move</div>
+  <div class="keys">DESKTOP: click to look · W/↑ walk · ←→ turn · A D strafe · ESC to release mouse<br>MOBILE: drag to look · hold WALK to move</div>
 </div>
 
 <div id="hud" class="panel">
@@ -223,9 +223,12 @@ wb.addEventListener('touchend',()=>walkHold=false);
 
 function move(dt){
   const speed=7.5*dt;
+  // arrow left/right TURN the view; A/D strafe
+  const turn=((keys.ArrowLeft)?1:0)-((keys.ArrowRight)?1:0);
+  yaw+=turn*1.9*dt;
   let fx=0,fz=0;
-  const f=(keys.KeyW||keys.ArrowUp||walkHold)?1:0 - ((keys.KeyS||keys.ArrowDown)?1:0);
-  const st=((keys.KeyD||keys.ArrowRight)?1:0)-((keys.KeyA||keys.ArrowLeft)?1:0);
+  const f=((keys.KeyW||keys.ArrowUp||walkHold)?1:0) - ((keys.KeyS||keys.ArrowDown)?1:0);
+  const st=((keys.KeyD)?1:0)-((keys.KeyA)?1:0);
   fx+=Math.sin(yaw)* -f + Math.cos(yaw)*st;
   fz+=Math.cos(yaw)* -f - Math.sin(yaw)*st;
   let nx=camera.position.x+fx*speed, nz=camera.position.z+fz*speed;
