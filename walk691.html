@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Walk the 691 Level — Iron Mountain Mine (v0.1, interpretive)</title>
+<script defer src="https://cloud.umami.is/script.js" data-website-id="137983b3-617d-41d9-9a9a-8e05851d4a97"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#050607;font-family:Georgia,serif;color:#efe6d0}
+  #c{display:block;width:100%;height:100%}
+  .panel{position:fixed;background:rgba(8,10,12,.86);border:1px solid #3a3f45;backdrop-filter:blur(4px)}
+  #hud{top:12px;left:12px;padding:12px 14px;max-width:290px;font-size:13px;line-height:1.45}
+  #hud h1{font-size:15px;margin:0 0 2px;letter-spacing:.04em}
+  #hud .sub{font-family:monospace;font-size:10px;color:#9fb2bd;letter-spacing:.12em;text-transform:uppercase}
+  #hud a{color:#d9a06b;font-family:monospace;font-size:11px;letter-spacing:.08em;text-decoration:none}
+  #start{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,6,7,.88);z-index:10;flex-direction:column;text-align:center;padding:20px}
+  #start h2{font-size:22px;margin:0 0 8px;letter-spacing:.05em}
+  #start p{max-width:460px;font-size:14px;color:#c9bfa8;line-height:1.6}
+  #start button{background:#8a3b2a;border:none;color:#efe6d0;padding:12px 26px;cursor:pointer;font-family:monospace;font-size:14px;letter-spacing:.1em;margin-top:14px}
+  #start .keys{font-family:monospace;font-size:11px;color:#8b949c;margin-top:14px;line-height:1.8}
+  #depth{bottom:14px;left:14px;padding:8px 14px;font-family:monospace;font-size:12px;color:#ffb26b;letter-spacing:.1em}
+  #walkbtn{bottom:16px;right:16px;width:84px;height:84px;border-radius:50%;background:rgba(138,59,42,.75);border:2px solid #d9a06b;color:#efe6d0;font-family:monospace;font-size:12px;display:none;z-index:5}
+  #vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.75) 100%)}
+  @media(pointer:coarse){ #walkbtn{display:block} }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="vignette"></div>
+
+<div id="start">
+  <h2>THE 691 LEVEL</h2>
+  <p>Six hundred and ninety-one feet below the hoist house collar. Mined 1944&ndash;1966; abandoned with the pumps off; flooded ever since. You are walking it as it was on a working day, by cap lamp — the pillars holding the roof are the mountain's own rock, left standing by the engineers. <br><br><em>Interpretive reconstruction from Map 00224 and the Hanna series — pillar layout stylized until the high-resolution scans are traced.</em></p>
+  <button id="go">⛏ &nbsp;LIGHT THE LAMP</button>
+  <div class="keys">DESKTOP: click to look · W A S D / arrows to walk · ESC to release mouse<br>MOBILE: drag to look · hold WALK to move</div>
+</div>
+
+<div id="hud" class="panel">
+  <h1>691′ LEVEL</h1>
+  <div class="sub">Main Orebody · first-person · v0.1 interpretive</div>
+  <div style="margin:6px 0 2px"><a href="/mine3d.html">&larr; TIME EXPLORER</a> &nbsp; <a href="/">HISTORY</a></div>
+</div>
+
+<div id="depth" class="panel">DEPTH 691′ · IRON MOUNTAIN MINE · 1962</div>
+<button id="walkbtn">WALK</button>
+
+<script>
+const canvas=document.getElementById('c');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x030404);
+scene.fog=new THREE.FogExp2(0x030404,0.028);
+
+const camera=new THREE.PerspectiveCamera(70,2,0.1,600);
+const EYE=1.7;                       // meters-ish; 1 unit = ~1 m here for walking feel
+camera.position.set(0,EYE,40);
+
+// cap lamp: spotlight bound to camera + weak point glow
+const lamp=new THREE.SpotLight(0xffe8c0,1.6,55,Math.PI/5,0.45,1.6);
+scene.add(lamp); scene.add(lamp.target);
+const glow=new THREE.PointLight(0xffd9a0,0.35,12); scene.add(glow);
+scene.add(new THREE.AmbientLight(0x223038,0.35));
+
+// ---------- rock material with canvas noise ----------
+function rockTexture(base,vary){
+  const c=document.createElement('canvas'); c.width=c.height=256;
+  const g=c.getContext('2d'); g.fillStyle=base; g.fillRect(0,0,256,256);
+  for(let i=0;i<4200;i++){
+    g.fillStyle=`rgba(${vary[0]+Math.random()*30|0},${vary[1]+Math.random()*25|0},${vary[2]+Math.random()*20|0},${0.12+Math.random()*0.25})`;
+    const s=1+Math.random()*3.5;
+    g.fillRect(Math.random()*256,Math.random()*256,s,s);
+  }
+  const t=new THREE.CanvasTexture(c); t.wrapS=t.wrapT=THREE.RepeatWrapping; return t;
+}
+const rockT=rockTexture('#2a2320',[70,50,40]);   // country rock: dark brown-gray
+const oreT =rockTexture('#33201c',[120,45,35]);  // hematite-rich: rusty
+const floorT=rockTexture('#241f1c',[60,48,40]); floorT.repeat.set(24,24);
+
+// ---------- the room ----------
+const ROOM=170;                       // walkable radius-ish
+const floor=new THREE.Mesh(new THREE.CircleGeometry(ROOM,40),
+  new THREE.MeshLambertMaterial({map:floorT}));
+floor.rotation.x=-Math.PI/2; scene.add(floor);
+// back (roof) — slightly irregular
+const roofGeo=new THREE.CircleGeometry(ROOM,40);
+{ const p=roofGeo.attributes.position;
+  for(let i=0;i<p.count;i++){ p.setZ(i,(Math.random()-0.5)*1.6); } p.needsUpdate=true; }
+const roof=new THREE.Mesh(roofGeo,new THREE.MeshLambertMaterial({map:rockT}));
+roof.rotation.x=Math.PI/2; roof.position.y=5.2; scene.add(roof);
+// perimeter wall (the stope face)
+const wall=new THREE.Mesh(new THREE.CylinderGeometry(ROOM,ROOM,5.4,48,1,true),
+  new THREE.MeshLambertMaterial({map:oreT,side:THREE.BackSide}));
+wall.position.y=2.6; scene.add(wall);
+
+// ---------- the pillar forest ----------
+// interpretive layout: irregular grid ~ every 18-26 units, pillars 3-6 units across
+const pillars=[];  // {x,z,r} for collision
+const pilMat=new THREE.MeshLambertMaterial({map:rockT});
+for(let gx=-7;gx<=7;gx++)for(let gz=-7;gz<=7;gz++){
+  const x=gx*22+(Math.sin(gx*7.3+gz*3.1)*6);
+  const z=gz*22+(Math.cos(gx*2.7+gz*5.9)*6);
+  if(Math.hypot(x,z)>ROOM-14) continue;
+  if(Math.hypot(x-0,z-40)<10) continue;                 // keep spawn clear
+  if(Math.abs(gx)+Math.abs(gz)===0) continue;
+  const r=2.2+((gx*13+gz*7)%10)/10*2.2;
+  const sides=5+((gx+gz)&3);
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r*1.05,r,5.4,sides),pilMat);
+  m.position.set(x,2.7,z);
+  m.rotation.y=(gx*gz)%7*0.4;
+  scene.add(m); pillars.push({x,z,r:r+0.7});
+}
+
+// ---------- artifacts of the working level ----------
+function plaque(text,x,z,color){
+  const c=document.createElement('canvas'); c.width=1024;c.height=200;
+  const g=c.getContext('2d'); g.font='600 40px monospace';
+  g.fillStyle=color||'#ffd9a0'; g.textBaseline='middle';
+  g.shadowColor='#000'; g.shadowBlur=10; g.fillText(text,20,100);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+  sp.scale.set(16,3.2,1); sp.position.set(x,3.4,z); scene.add(sp);
+}
+// shaft station: the way out
+const stationX=0, stationZ=58;
+const cage=new THREE.Mesh(new THREE.BoxGeometry(3,4.6,3),
+  new THREE.MeshLambertMaterial({color:0x3a3f45,wireframe:true}));
+cage.position.set(stationX,2.3,stationZ); scene.add(cage);
+const cageLight=new THREE.PointLight(0xbfd8ff,0.8,26); cageLight.position.set(stationX,4,stationZ); scene.add(cageLight);
+plaque('"B" SHAFT STATION — 691 · cages to surface',stationX,stationZ+4,'#bfd8ff');
+
+// ore car on rails, abandoned in place
+const railMat=new THREE.MeshLambertMaterial({color:0x4a4038});
+const rail1=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.12,90),railMat);
+const rail2=rail1.clone(); rail1.position.set(-0.6,0.07,10); rail2.position.set(0.6,0.07,10);
+scene.add(rail1,rail2);
+const car=new THREE.Group();
+const tub=new THREE.Mesh(new THREE.BoxGeometry(2.2,1.2,3.2),new THREE.MeshLambertMaterial({color:0x5a4a3a}));
+tub.position.y=1.0; car.add(tub);
+[[-0.8,-1.1],[0.8,-1.1],[-0.8,1.1],[0.8,1.1]].forEach(w=>{
+  const wh=new THREE.Mesh(new THREE.CylinderGeometry(0.35,0.35,0.2,10),new THREE.MeshLambertMaterial({color:0x2f2a26}));
+  wh.rotation.z=Math.PI/2; wh.position.set(w[0],0.35,w[1]); car.add(wh);});
+const orepile=new THREE.Mesh(new THREE.ConeGeometry(1.1,0.8,7),new THREE.MeshLambertMaterial({map:oreT}));
+orepile.position.y=1.9; car.add(orepile);
+car.position.set(0,0,-14); scene.add(car);
+pillars.push({x:0,z:-14,r:2.4});
+plaque('ORE CAR — left on the rails, 1966',0,-9,'#d9a06b');
+
+// ore chute (raise from above)
+const chute=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.4,2.6,7),
+  new THREE.MeshLambertMaterial({map:oreT}));
+chute.position.set(-34,4,-30); scene.add(chute);
+plaque('ORE CHUTE — rock from the 654 above',-34,-25,'#c98a4a');
+
+// drill steel rack
+const rack=new THREE.Group();
+for(let i=0;i<6;i++){
+  const rod=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,2.6,5),
+    new THREE.MeshLambertMaterial({color:0x6a6a70}));
+  rod.position.set(i*0.22-0.6,1.3,0); rod.rotation.z=0.12; rack.add(rod);
+}
+rack.position.set(30,0,22); scene.add(rack);
+plaque('DRILL STEEL — sharpened at the surface forge',30,26,'#a9a9b0');
+
+// history plaques
+plaque('YOU ARE 691 FEET BELOW THE HOIST HOUSE',0,34,'#efe6d0');
+plaque('THE PILLARS ARE THE MOUNTAIN — left to hold the roof',-40,20,'#c9bfa8');
+plaque('TODAY THIS ROOM IS UNDER BLACK WATER',44,-40,'#5ab0d8');
+
+// distant drip sparkle (tiny points)
+const drops=new THREE.Points(
+  (()=>{const g=new THREE.BufferGeometry(); const n=140; const a=new Float32Array(n*3);
+    for(let i=0;i<n;i++){const t=Math.random()*Math.PI*2,r=Math.random()*ROOM;
+      a[i*3]=Math.cos(t)*r; a[i*3+1]=Math.random()*5; a[i*3+2]=Math.sin(t)*r;}
+    g.setAttribute('position',new THREE.BufferAttribute(a,3)); return g;})(),
+  new THREE.PointsMaterial({color:0x88aacc,size:0.06,transparent:true,opacity:0.6}));
+scene.add(drops);
+
+// ---------- first-person controls ----------
+let yaw=Math.PI, pitch=0, locked=false;
+const startEl=document.getElementById('start');
+document.getElementById('go').onclick=()=>{
+  startEl.style.display='none';
+  if(matchMedia('(pointer:fine)').matches) canvas.requestPointerLock();
+};
+document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;});
+canvas.addEventListener('click',()=>{ if(!locked && startEl.style.display==='none' && matchMedia('(pointer:fine)').matches) canvas.requestPointerLock(); });
+addEventListener('mousemove',e=>{
+  if(!locked) return;
+  yaw-=e.movementX*0.0022; pitch-=e.movementY*0.0022;
+  pitch=Math.max(-1.2,Math.min(1.2,pitch));
+});
+// touch look
+let tx=0,ty=0,touchLook=false;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){touchLook=true;tx=e.touches[0].clientX;ty=e.touches[0].clientY;}});
+canvas.addEventListener('touchmove',e=>{
+  if(!touchLook)return;
+  const t=e.touches[0];
+  yaw-=(t.clientX-tx)*0.004; pitch-=(t.clientY-ty)*0.004;
+  pitch=Math.max(-1.2,Math.min(1.2,pitch));
+  tx=t.clientX; ty=t.clientY; e.preventDefault();
+},{passive:false});
+canvas.addEventListener('touchend',()=>touchLook=false);
+
+const keys={};
+addEventListener('keydown',e=>keys[e.code]=true);
+addEventListener('keyup',e=>keys[e.code]=false);
+let walkHold=false;
+const wb=document.getElementById('walkbtn');
+wb.addEventListener('touchstart',e=>{walkHold=true;e.preventDefault();},{passive:false});
+wb.addEventListener('touchend',()=>walkHold=false);
+
+function move(dt){
+  const speed=7.5*dt;
+  let fx=0,fz=0;
+  const f=(keys.KeyW||keys.ArrowUp||walkHold)?1:0 - ((keys.KeyS||keys.ArrowDown)?1:0);
+  const st=((keys.KeyD||keys.ArrowRight)?1:0)-((keys.KeyA||keys.ArrowLeft)?1:0);
+  fx+=Math.sin(yaw)* -f + Math.cos(yaw)*st;
+  fz+=Math.cos(yaw)* -f - Math.sin(yaw)*st;
+  let nx=camera.position.x+fx*speed, nz=camera.position.z+fz*speed;
+  // collide with pillars
+  for(const p of pillars){
+    const d=Math.hypot(nx-p.x,nz-p.z);
+    if(d<p.r){ const push=(p.r-d); nx+=(nx-p.x)/d*push; nz+=(nz-p.z)/d*push; }
+  }
+  // stay in the room
+  const rr=Math.hypot(nx,nz);
+  if(rr>ROOM-3){ nx*= (ROOM-3)/rr; nz*=(ROOM-3)/rr; }
+  camera.position.x=nx; camera.position.z=nz;
+  // head bob
+  const moving=Math.abs(f)+Math.abs(st)>0;
+  bob+= moving? dt*9:0;
+  camera.position.y=EYE + (moving? Math.sin(bob)*0.05:0);
+}
+let bob=0;
+
+function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
+let last=0;
+function animate(t){
+  requestAnimationFrame(animate); resize();
+  const dt=Math.min(0.05,(t-last)/1000||0.016); last=t;
+  if(startEl.style.display==='none') move(dt);
+  camera.rotation.set(0,0,0);
+  camera.rotateY(yaw); camera.rotateX(pitch);
+  // lamp follows view
+  lamp.position.copy(camera.position);
+  const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+  lamp.target.position.copy(camera.position).add(dir.multiplyScalar(10));
+  glow.position.copy(camera.position);
+  // lamp flicker
+  lamp.intensity=1.55+Math.sin(t*0.013)*0.06+Math.random()*0.03;
+  renderer.render(scene,camera);
+}
+animate();
+</script>
+</body>
+</html>
