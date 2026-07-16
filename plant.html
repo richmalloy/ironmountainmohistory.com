@@ -91,14 +91,14 @@ wst.position.set(-22,6,-3); wood.add(wst);
 for(let i=0;i<3;i++){const puff=new THREE.Mesh(new THREE.SphereGeometry(1.4+i*0.8,7,7),
  new THREE.MeshBasicMaterial({color:0xcccccc,transparent:true,opacity:0.32-i*0.08}));
  puff.position.set(-22+i*1.2,13.5+i*2.6,-3); wood.add(puff);}
-T(wood,1885,1923);
-const woodL=label('WOODEN HOIST WORKS — steam',4.5,'#e8c9a0'); woodL.position.set(-14,15,8); T(woodL,1885,1923);
-const f23=label('★ SEPT 18, 1923 — FIRE',5,'#ff6a3a'); f23.position.set(-8,18,4); T(f23,1923,1926);
+wood.position.set(30,0,0); T(wood,1885,1923);
+const woodL=label('WOODEN HOIST WORKS — steam',4.5,'#e8c9a0'); woodL.position.set(16,15,8); T(woodL,1885,1923);
+const f23=label('★ SEPT 18, 1923 — FIRE',5,'#ff6a3a'); f23.position.set(22,18,4); T(f23,1923,1926);
 
 // ===== interregnum 1923–1951: bare shaft collar =====
 const collar=new THREE.Mesh(new THREE.BoxGeometry(4,0.8,4),new THREE.MeshLambertMaterial({color:0x3a3f45}));
-collar.position.set(0,0.4,0); T(collar,1923,1951);
-const colL=label('BARE COLLAR — the idle years',4,'#8b949c'); colL.position.set(0,4,8); T(colL,1930,1944);
+collar.position.set(30,0.4,0); T(collar,1923,1951);
+const colL=label('BARE COLLAR — the idle years',4,'#8b949c'); colL.position.set(30,4,8); T(colL,1930,1944);
 
 // ===== ERA 2: the brick plant, ~1951–present =====
 // long brick building: hoist room (east end) + office/post office (west end)
@@ -143,8 +143,8 @@ const sdeck=new THREE.Mesh(new THREE.BoxGeometry(5,1.6,5),steel); sdeck.position
 [[-0.9],[0.9]].forEach(p=>{
  const sh=new THREE.Mesh(new THREE.TorusGeometry(1.5,0.22,8,18),new THREE.MeshLambertMaterial({color:0x3a3f45}));
  sh.position.set(0,27.6,p[0]); sh.rotation.y=Math.PI/2; shf.add(sh);});
-T(shf,1951);
-const hfL=label('STEEL HEADFRAME — "B" SHAFT',4.5,'#ffb26b'); hfL.position.set(0,31,7); T(hfL,1951);
+shf.position.set(30,0,0); T(shf,1951);
+const hfL=label('STEEL HEADFRAME — "B" SHAFT',4.5,'#ffb26b'); hfL.position.set(30,31,7); T(hfL,1951);
 // hoist ropes: house -> sheaves -> shaft (working era only)
 function rope(x1,y1,z1,x2,y2,z2){
  const dir=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const len=dir.length();
@@ -152,15 +152,15 @@ function rope(x1,y1,z1,x2,y2,z2){
   new THREE.MeshBasicMaterial({color:0xd8d0c0}));
  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); return m;}
-T(rope(-10,7,-0.9, 0,27.6,-0.9),1951,1966);
-T(rope(-10,7, 0.9, 0,27.6, 0.9),1951,1966);
-T(rope(0,27.6,-0.9,0,1,-0.9),1951,1966);
-T(rope(0,27.6, 0.9,0,1, 0.9),1951,1966);
-const ropeL=label('ROPES RUNNING — ore below',3.6,'#d8d0c0'); ropeL.position.set(-4,22,-6); T(ropeL,1954,1966);
-const endL=label('1966 — the ropes stop',4,'#8b949c'); endL.position.set(-4,22,-6); T(endL,1966,1970);
+T(rope(-7,7,-0.9, 30,27.6,-0.9),1951,1966);
+T(rope(-7,7, 0.9, 30,27.6, 0.9),1951,1966);
+T(rope(30,27.6,-0.9,30,1,-0.9),1951,1966);
+T(rope(30,27.6, 0.9,30,1, 0.9),1951,1966);
+const ropeL=label('ROPES CROSSING THE YARD — drums in the house, sheaves on the frame',3.4,'#d8d0c0'); ropeL.position.set(10,20,-5); T(ropeL,1954,1966);
+const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(10,20,-5); T(endL,1966,1970);
 
 // water towers east of headframe (extant)
-[[14,2.8,2.8,24,true],[20,-3,1.9,9,false]].forEach(t=>{ // big tower rivals the headframe; small tank squat
+[[42,2.8,2.8,24,true],[48,-3,1.9,9,false]].forEach(t=>{ // big tower rivals the headframe; small tank squat
  const grp=new THREE.Group();
  const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],4.2,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
  tank.position.y=t[3]; grp.add(tank);
@@ -171,7 +171,7 @@ const endL=label('1966 — the ropes stop',4,'#8b949c'); endL.position.set(-4,22
   lg.position.set(p[0]*t[2]*0.55,(t[3]-2)/2,p[1]*t[2]*0.55); grp.add(lg);});
  grp.position.set(t[0],0,t[1]); T(grp,1951);
 });
-const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(17,19,0); T(wtL,1951);
+const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(45,19,0); T(wtL,1951);
 
 // THICKENER behind (west of) the house — octagonal ring; fills with rock ~1968
 const oct=new THREE.Mesh(new THREE.TorusGeometry(4.2,0.6,6,8),
@@ -202,20 +202,20 @@ const m3=new THREE.Mesh(new THREE.BoxGeometry(7,7,8),millMat);    m3.position.se
 // the inclined ore-bridge conveyor descending from the mill top out over the stockpiles (hero's signature)
 const conv=new THREE.Mesh(new THREE.BoxGeometry(34,1.1,2.2),millMat);
 conv.position.set(20,10,4); conv.rotation.z=-0.42; conv.rotation.y=0.25; mill.add(conv);
-mill.position.set(6,0,-13); T(mill,1944,1978);
+mill.position.set(38,0,-14); T(mill,1944,1978);
 // stockpiles under the conveyor's end (working era)
-[[40,-4,10,6],[50,-12,13,7.5],[33,-16,8,5]].forEach(p=>{
+[[68,-4,10,6],[78,-12,13,7.5],[61,-16,8,5]].forEach(p=>{
   const sp=new THREE.Mesh(new THREE.ConeGeometry(p[2],p[3],9),
     new THREE.MeshLambertMaterial({color:0x6e5a4c}));
   sp.position.set(p[0],p[3]/2,p[1]); T(sp,1944,1980);});
-const millL=label('THE MILL — ore fed from the headframe, stepping down by gravity',3.9,'#c9c2ae'); millL.position.set(16,17,-13); T(millL,1944,1978);
-const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(14,12,-10); T(f78,1978,1982);
+const millL=label('THE MILL — ore fed from the headframe, stepping down by gravity',3.9,'#c9c2ae'); millL.position.set(46,19,-14); T(millL,1944,1978);
+const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(44,13,-10); T(f78,1978,1982);
 // rail BEHIND the mill (per RM) with ore cars, loading out concentrates
 const millRail=new THREE.Mesh(new THREE.BoxGeometry(120,0.15,1.4),new THREE.MeshLambertMaterial({color:0x6b6258}));
-millRail.position.set(14,0.1,-22); T(millRail,1944);
+millRail.position.set(44,0.1,-24); T(millRail,1944);
 for(let i=0;i<3;i++){
   const ocar=new THREE.Mesh(new THREE.BoxGeometry(4,1.6,2),new THREE.MeshLambertMaterial({color:0x54443a}));
-  ocar.position.set(18+i*5.5,0.9,-22); T(ocar,1944,1978);
+  ocar.position.set(42+i*5.5,0.9,-24); T(ocar,1944,1978);
 }
 
 // quarry-era touch
