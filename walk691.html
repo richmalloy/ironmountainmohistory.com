@@ -75,6 +75,7 @@
   </div>
 </div>
 <button id="walkbtn">WALK</button>
+<button id="lower" class="panel" style="bottom:70px;left:50%;transform:translateX(-50%);padding:12px 26px;background:rgba(138,59,42,.9);border:2px solid #d9a06b;color:#efe6d0;font-family:monospace;font-size:14px;letter-spacing:.12em;cursor:pointer;display:none">⬇ &nbsp;LOWER THE CAGE</button>
 <div id="hint" class="panel" style="bottom:64px;left:50%;transform:translateX(-50%);padding:6px 14px;font-family:monospace;font-size:10px;color:#c9a06b;letter-spacing:.12em;display:none">CLICK THE VIEW TO TAKE THE CONTROLS · ESC RELEASES</div>
 
 <script>
@@ -211,9 +212,20 @@ scene.add(drops);
 // ---------- the shaft & the descent ----------
 let lampScale=1;
 const DESC_TOP=64;                       // visual shaft height above the level
-const tube=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,DESC_TOP+4,10,1,true),
-  new THREE.MeshLambertMaterial({map:rockT,side:THREE.BackSide}));
-tube.position.set(stationX,(DESC_TOP+4)/2-1,stationZ); scene.add(tube);
+const tubeMat=new THREE.MeshLambertMaterial({map:rockT,side:THREE.BackSide});
+// upper shaft: full circle
+const tubeUp=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,DESC_TOP-2,10,1,true),tubeMat);
+tubeUp.position.set(stationX,(DESC_TOP-2)/2+6-1,stationZ); scene.add(tubeUp);
+// station brow: ring with a DOORWAY opening toward the level (room lies toward -z)
+const GAP=1.25; // ~72°
+const brow=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,7,10,1,true, Math.PI*1.5+GAP/2, Math.PI*2-GAP),tubeMat);
+brow.position.set(stationX,2.5,stationZ); scene.add(brow);
+// timber door frame
+const timb=new THREE.MeshLambertMaterial({color:0x4a3a2c});
+[[-1.9],[1.9]].forEach(p=>{const post=new THREE.Mesh(new THREE.BoxGeometry(0.4,5,0.4),timb);
+ post.position.set(stationX+p[0],2.5,stationZ-3.1); scene.add(post);});
+const lint=new THREE.Mesh(new THREE.BoxGeometry(4.4,0.45,0.5),timb);
+lint.position.set(stationX,5.1,stationZ-3.1); scene.add(lint);
 // guide timbers in the shaft
 [[-2.6,0],[2.6,0]].forEach(p=>{
   const g=new THREE.Mesh(new THREE.BoxGeometry(0.3,DESC_TOP+4,0.3),
@@ -235,20 +247,48 @@ LEVELS_ABOVE.forEach(d=>{
   ring.rotation.x=Math.PI/2; ring.position.set(stationX,depthToY(d),stationZ); scene.add(ring);
   shaftTag(d+"′ LEVEL", depthToY(d));
 });
-// --- daylight at the collar ---
+// --- the surface at the collar ---
+const SURF=DESC_TOP+3.4;
 const skyDisk=new THREE.Mesh(new THREE.CircleGeometry(3.3,20),
   new THREE.MeshBasicMaterial({color:0xcfe4f5,fog:false}));
-skyDisk.rotation.x=Math.PI/2; skyDisk.position.set(stationX,DESC_TOP+3.4,stationZ); scene.add(skyDisk);
-// headframe legs over the collar, seen from below in daylight
+skyDisk.rotation.x=Math.PI/2; skyDisk.position.set(stationX,SURF+30,stationZ); scene.add(skyDisk);
+// surface ground: a wide annulus of yard around the shaft mouth
+const yard=new THREE.Mesh(new THREE.RingGeometry(3.6,70,36),
+  new THREE.MeshLambertMaterial({color:0x5a6a4a,side:THREE.DoubleSide}));
+yard.rotation.x=-Math.PI/2; yard.position.set(stationX,SURF,stationZ); scene.add(yard);
+// steel headframe over the collar
+const steelM=new THREE.MeshLambertMaterial({color:0x6e4438});
 [[-2.6,-2.6],[2.6,-2.6],[-2.6,2.6],[2.6,2.6]].forEach(p=>{
-  const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.2,14,6),
-    new THREE.MeshLambertMaterial({color:0x6e4438}));
-  leg.position.set(stationX+p[0]*0.55,DESC_TOP+9,stationZ+p[1]*0.55); scene.add(leg);});
+  const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.24,15,6),steelM);
+  leg.position.set(stationX+p[0]*0.55,SURF+7.5,stationZ+p[1]*0.55); scene.add(leg);});
+const sdeck=new THREE.Mesh(new THREE.BoxGeometry(3.6,1.2,3.6),steelM);
+sdeck.position.set(stationX,SURF+15.4,stationZ); scene.add(sdeck);
+// the brick hoist house across the yard, ropes flying to the sheaves
+const hhouse=new THREE.Group();
+const hb=new THREE.Mesh(new THREE.BoxGeometry(14,5,8),new THREE.MeshLambertMaterial({color:0x8a5040}));
+hb.position.y=2.5; hhouse.add(hb);
+const hr=new THREE.Mesh(new THREE.BoxGeometry(15,0.7,9),new THREE.MeshLambertMaterial({color:0x5a4a44}));
+hr.position.y=5.4; hhouse.add(hr);
+hhouse.position.set(stationX-26,SURF,stationZ); scene.add(hhouse);
+function srope(x1,y1,z1,x2,y2,z2){
+  const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,L,4),
+    new THREE.MeshBasicMaterial({color:0xd8d0c0}));
+  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
+srope(stationX-20,SURF+4.5,stationZ-0.8, stationX,SURF+15.4,stationZ-0.8);
+srope(stationX-20,SURF+4.5,stationZ+0.8, stationX,SURF+15.4,stationZ+0.8);
+const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
+ const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle='#efe6d0';
+ g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
+ g.fillText('THE HOIST HOUSE — the drums are turning inside',14,100);
+ const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+ sp.scale.set(22,4.3,1);sp.position.set(stationX-26,SURF+9,stationZ);scene.add(sp);return sp;})();
 const dayLight=new THREE.PointLight(0xeaf2ff,1.4,50);
-dayLight.position.set(stationX,DESC_TOP+2,stationZ); scene.add(dayLight);
+dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
 function applyDepthAtmosphere(){
-  const f=Math.max(0,Math.min(1,(DESC_TOP-camera.position.y)/(DESC_TOP-EYE)));
+  const f=Math.max(0,Math.min(1,(SURF-camera.position.y)/(SURF-EYE)));
   const c=SKY.clone().lerp(CAVE, Math.min(1,f*1.6));
   scene.background.copy(c); scene.fog.color.copy(c);
   scene.fog.density=0.004+ (0.028/Math.sqrt(lampScale)-0.004)*f;
@@ -257,7 +297,7 @@ function applyDepthAtmosphere(){
 let descending=false, descY=DESC_TOP;
 const dft=document.getElementById('dft'), dlv=document.getElementById('dlv');
 function updateDepthHUD(){
-  const d=Math.max(0,Math.min(691, Math.round((1-(camera.position.y-EYE)/(DESC_TOP-EYE))*691)));
+  const d=Math.max(0,Math.min(691, Math.round((1-(camera.position.y-EYE)/(SURF-EYE))*691)));
   dft.textContent=d;
   if(!descending && d>=691){ dlv.textContent='691 LEVEL · MAIN OREBODY · 1962'; return; }
   let passing=null;
@@ -273,16 +313,38 @@ document.getElementById('lamprange').oninput=e=>{
   scene.fog.density=0.028/Math.sqrt(lampScale);
 };
 
+// ---------- drift lights: a string of bulbs from the station into the workings ----------
+const LPATH=[[0,52],[0,34],[0,16],[-8,4],[-18,-8],[-28,-20],[-34,-28]];
+for(let i=0;i<LPATH.length;i++){
+  const [lx,lz]=LPATH[i];
+  const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,6),
+    new THREE.MeshBasicMaterial({color:0xffe0a8}));
+  bulb.position.set(lx,4.7,lz); scene.add(bulb);
+  if(i%2===0){ const pl=new THREE.PointLight(0xffd9a0,0.55,20);
+    pl.position.set(lx,4.5,lz); scene.add(pl); }
+  if(i>0){ const [px,pz]=LPATH[i-1];
+    const wire=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,
+      Math.hypot(lx-px,lz-pz),3),new THREE.MeshBasicMaterial({color:0x2a2a2a}));
+    wire.position.set((lx+px)/2,4.75,(lz+pz)/2);
+    wire.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),
+      new THREE.Vector3(lx-px,0,lz-pz).normalize()); scene.add(wire); }
+}
 // ---------- first-person controls ----------
 let yaw=Math.PI, pitch=0, locked=false;
 const startEl=document.getElementById('start');
-let holdUntil=0;
+let atSurface=false;
 document.getElementById('go').onclick=()=>{
   startEl.style.display='none';
+  atSurface=true;
+  camera.position.set(stationX+1.2,SURF+EYE,stationZ+2.5);
+  yaw=Math.PI*0.78; pitch=0.08;                         // taking in the yard & house
+  document.getElementById('lower').style.display='block';
   document.getElementById('hint').style.display='block';
-  descending=true; holdUntil=performance.now()+1800;   // a breath of daylight first
-  camera.position.set(stationX,DESC_TOP,stationZ);
-  yaw=Math.PI; pitch=0.35;                              // looking UP at the sky
+};
+document.getElementById('lower').onclick=()=>{
+  document.getElementById('lower').style.display='none';
+  atSurface=false; descending=true;
+  camera.position.x=stationX; camera.position.z=stationZ;
 };
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;
   document.getElementById('hint').style.display = locked?'none':'block';});
@@ -370,13 +432,11 @@ function animate(t){
   requestAnimationFrame(animate); resize();
   const dt=Math.min(0.05,(t-last)/1000||0.016); last=t;
   if(descending){
-    if(performance.now()>holdUntil){
-      camera.position.y-=dt*4.6;                     // the cage drops
-      if(pitch>-0.05) pitch-=dt*0.25;                // gaze settles level as you sink
-    }
+    camera.position.y-=dt*4.6;                       // the cage drops
+    if(pitch>-0.05) pitch-=dt*0.22;                  // gaze settles level as you sink
     camera.position.x=stationX; camera.position.z=stationZ;
     if(camera.position.y<=EYE){ camera.position.y=EYE; descending=false; }
-  } else if(startEl.style.display==='none') move(dt);
+  } else if(!atSurface && startEl.style.display==='none') move(dt);
   applyDepthAtmosphere();
   updateDepthHUD();
   camera.rotation.set(0,0,0);
