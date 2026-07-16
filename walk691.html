@@ -270,61 +270,57 @@ function sstrut(x1,y1,z1,x2,y2,z2,r){
   const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,6),steelM);
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-// battered legs: wide across the rope axis (z), narrow along it (x) — the ropes arrive from the west
+// battered legs: wide across the rope axis (x), narrow along it (z) — the ropes arrive from the building
 [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
-  sstrut(stationX+p[0]*1.25,SURF,stationZ+p[1]*2.0, stationX+p[0]*0.7,SURF+15,stationZ+p[1]*1.4,0.17);});
-// backlegs toward the hoist room (west), feet on the rope axis
-sstrut(stationX-8.5,SURF,stationZ-1.3, stationX-0.4,SURF+14.6,stationZ-1.2,0.18);
-sstrut(stationX-8.5,SURF,stationZ+1.3, stationX-0.4,SURF+14.6,stationZ+1.2,0.18);
-const sdeck=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.0,4.4),steelM);
+  sstrut(stationX+p[0]*2.0,SURF,stationZ+p[1]*1.25, stationX+p[0]*1.4,SURF+15,stationZ+p[1]*0.7,0.17);});
+// backlegs leaning home toward the hoist house, feet on the rope axis
+sstrut(stationX-1.3,SURF,stationZ-8.5, stationX-1.2,SURF+14.6,stationZ-0.4,0.18);
+sstrut(stationX+1.3,SURF,stationZ-8.5, stationX+1.2,SURF+14.6,stationZ-0.4,0.18);
+const sdeck=new THREE.Mesh(new THREE.BoxGeometry(4.4,1.0,2.4),steelM);
 sdeck.position.set(stationX,SURF+15.6,stationZ); scene.add(sdeck);
 // sheave wheels, side by side across the wide top, wheel planes aligned with the ropes
 [[-0.8],[0.8]].forEach(p=>{
   const sw=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.14,7,16),
     new THREE.MeshLambertMaterial({color:0x3a3f45}));
-  sw.position.set(stationX,SURF+16.6,stationZ+p[0]); scene.add(sw);});
+  sw.rotation.y=Math.PI/2;
+  sw.position.set(stationX+p[0],SURF+16.6,stationZ); scene.add(sw);});
 // the brick hoist house across the yard, ropes flying to the sheaves
 const hhouse=new THREE.Group();
 const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
-// ONE BUILDING — hoist room and office under the same long roof (per RM + the 2020 aerial).
-// The hoist room is the EAST end of the rectangle; its end wall faces the headframe across the yard,
-// twin drum beds inside on the rope axis (RM interior observation, Apr 2026).
-const hb=new THREE.Mesh(new THREE.BoxGeometry(50,5.2,8),brickM); hb.position.set(-27,2.6,0); hhouse.add(hb);
+// ONE BUILDING — office + hoist room under one roof, standing ACROSS THE YARD from the headframe
+// (per RM aerial): its long yard-facing wall looks at the frame, the frame offset toward the
+// building's left end. Rope port = 2nd window from the left, straight off the drum beds inside.
+const hb=new THREE.Mesh(new THREE.BoxGeometry(66,5.2,8),brickM); hb.position.set(21,2.6,0); hhouse.add(hb);
 const roofM=new THREE.MeshLambertMaterial({color:0x6e3a34});   // the red metal roof
-const hr=new THREE.Mesh(new THREE.BoxGeometry(51.5,0.7,9),roofM);
-hr.position.set(-27,5.9,0); hhouse.add(hr);
-// window row along the yard face
-for(let i=0;i<8;i++){
+const hr=new THREE.Mesh(new THREE.BoxGeometry(67.5,0.7,9),roofM); hr.position.set(21,5.9,0); hhouse.add(hr);
+// window row along the yard face — the ROPE PORT is the 2nd opening from the left
+for(let i=0;i<11;i++){
+  if(i===1) continue;
   const w=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,0.15),
     new THREE.MeshLambertMaterial({color:0x2a3138}));
-  w.position.set(-46+i*5.2,2.6,4.05); hhouse.add(w);
+  w.position.set(-9+i*5.2,2.6,4.05); hhouse.add(w);
 }
-// EAST END WALL (faces the headframe): openings with the rope port at the 2nd from the left
-const ew1=new THREE.Mesh(new THREE.BoxGeometry(0.15,1.6,1.6),new THREE.MeshLambertMaterial({color:0x2a3138}));
-ew1.position.set(-1.95,2.6,2.4); hhouse.add(ew1);
-const ew2=new THREE.Mesh(new THREE.BoxGeometry(0.15,1.6,1.6),new THREE.MeshLambertMaterial({color:0x2a3138}));
-ew2.position.set(-1.95,2.6,-2.4); hhouse.add(ew2);
-const hport=new THREE.Mesh(new THREE.BoxGeometry(0.2,2.2,2.6),
+const hport=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.4,0.2),
   new THREE.MeshLambertMaterial({color:0x0e1114}));
-hport.position.set(-1.92,3.8,0); hhouse.add(hport);
-hhouse.position.set(stationX-24,SURF,stationZ); scene.add(hhouse);
+hport.position.set(-3.8,3.7,4.1); hhouse.add(hport);
+hhouse.position.set(stationX,SURF,stationZ-32); scene.add(hhouse);
 function srope(x1,y1,z1,x2,y2,z2){
   const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
   const m=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,L,4),
     new THREE.MeshBasicMaterial({color:0xd8d0c0}));
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-srope(stationX-25.9,SURF+4.2,stationZ-0.8, stationX,SURF+16.6,stationZ-0.8);
-srope(stationX-25.9,SURF+4.2,stationZ+0.8, stationX,SURF+16.6,stationZ+0.8);
+srope(stationX-4.4,SURF+4.0,stationZ-27.9, stationX-0.8,SURF+16.6,stationZ);
+srope(stationX-3.2,SURF+4.0,stationZ-27.9, stationX+0.8,SURF+16.6,stationZ);
 // and down the shaft — you ride under these
-srope(stationX,SURF+16.6,stationZ-0.8, stationX,EYE+4.2,stationZ-0.8);
-srope(stationX,SURF+16.6,stationZ+0.8, stationX,EYE+4.2,stationZ+0.8);
+srope(stationX-0.8,SURF+16.6,stationZ, stationX-0.8,EYE+4.2,stationZ);
+srope(stationX+0.8,SURF+16.6,stationZ, stationX+0.8,EYE+4.2,stationZ);
 const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
  const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle='#efe6d0';
  g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
  g.fillText('THE HOIST HOUSE & OFFICE — the ropes run from here',14,100);
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
- sp.scale.set(22,4.3,1);sp.position.set(stationX-52,SURF+9,stationZ+11);scene.add(sp);return sp;})();
+ sp.scale.set(22,4.3,1);sp.position.set(stationX+30,SURF+8,stationZ-24);scene.add(sp);return sp;})();
 const dayLight=new THREE.PointLight(0xeaf2ff,1.4,50);
 // ---------- the MILL, behind-right of the headframe, with its ore-bridge conveyor ----------
 const millMat=new THREE.MeshLambertMaterial({color:0x5f5346});
@@ -337,8 +333,8 @@ const sm3=new THREE.Mesh(new THREE.BoxGeometry(5.5,5,6.5),millMat); sm3.position
   rf.position.set(p[0],p[1],0); smill.add(rf);});
 const sconv=new THREE.Mesh(new THREE.BoxGeometry(26,0.9,1.8),millMat);
 sconv.position.set(16,7,-3.4); sconv.rotation.z=-0.42; sconv.rotation.y=0.22; smill.add(sconv);
-smill.position.set(stationX+8,SURF,stationZ-18); scene.add(smill);
-[[stationX+32,stationZ-26,7,4.5],[stationX+40,stationZ-32,9,5.5]].forEach(p=>{
+smill.position.set(stationX+26,SURF,stationZ-6); scene.add(smill);
+[[stationX+50,stationZ-14,7,4.5],[stationX+60,stationZ-20,9,5.5]].forEach(p=>{
   const sp2=new THREE.Mesh(new THREE.ConeGeometry(p[2],p[3],9),
     new THREE.MeshLambertMaterial({map:oreT}));
   sp2.position.set(p[0],SURF+p[3]/2,p[1]); scene.add(sp2);});
@@ -355,8 +351,8 @@ smill.position.set(stationX+8,SURF,stationZ-18); scene.add(smill);
   grp.position.set(t[0],SURF,t[1]); scene.add(grp);
 });
 // surface obstacle collisions (mill, stockpiles, towers)
-const SOBS=[{x:stationX+14,z:stationZ-18,r:12},{x:stationX+32,z:stationZ-26,r:7.5},
-  {x:stationX+40,z:stationZ-32,r:9.5},{x:stationX+13,z:stationZ+3,r:2.4},{x:stationX+18,z:stationZ-4,r:1.8}];
+const SOBS=[{x:stationX+33,z:stationZ-6,r:11},{x:stationX+50,z:stationZ-14,r:8},
+  {x:stationX+60,z:stationZ-20,r:9.5},{x:stationX+13,z:stationZ+3,r:2.4},{x:stationX+18,z:stationZ-4,r:1.8}];
 dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
 function applyDepthAtmosphere(){
@@ -425,14 +421,14 @@ function lookYawPitch(from,to){
 function startTour(){
   startEl.style.display='none'; atSurface=true; descending=false;
   beacon.visible=false; goTag.visible=false;
-  camera.position.set(stationX-46,SURF+EYE,stationZ+30);
-  yaw=lookYawPitch(camera.position,[stationX-50,SURF+3,stationZ+2])[0]; pitch=0;
+  camera.position.set(stationX-34,SURF+EYE,stationZ-14);
+  yaw=lookYawPitch(camera.position,[stationX+10,SURF+3,stationZ-30])[0]; pitch=0;
   tour={i:0,phase:'walk',t0:performance.now(),segs:[
-    {a:[stationX-46,SURF+EYE,stationZ+30], b:[stationX-22,SURF+EYE,stationZ+14], look:[stationX-33,SURF+3,stationZ+2], d:6.5,
-     t:'Morning shift, 1958. One long building — office, post office, and the hoist room at its east end, all under the same roof.'},
-    {a:[stationX-22,SURF+EYE,stationZ+14], b:[stationX-4,SURF+EYE,stationZ+9], look:[stationX,SURF+16,stationZ], d:5.5,
-     t:'The ropes leave the hoist room\u2019s east wall and cross the yard to the sheaves — singing already.'},
-    {a:[stationX-4,SURF+EYE,stationZ+9], b:[stationX,SURF+EYE,stationZ+0.4], look:[stationX,SURF-3,stationZ], d:4.5,
+    {a:[stationX-34,SURF+EYE,stationZ-14], b:[stationX-14,SURF+EYE,stationZ-10], look:[stationX+12,SURF+3,stationZ-29], d:6.5,
+     t:'Morning shift, 1958. One long building — office, post office, and the hoist room at the near end, all under one roof.'},
+    {a:[stationX-14,SURF+EYE,stationZ-10], b:[stationX-6,SURF+EYE,stationZ-2], look:[stationX,SURF+16,stationZ], d:5.5,
+     t:'The ropes leave the wall by the second window and cross the yard to the sheaves — singing already.'},
+    {a:[stationX-6,SURF+EYE,stationZ-2], b:[stationX,SURF+EYE,stationZ-0.5], look:[stationX,SURF-3,stationZ], d:4.5,
      t:'Step on. Hold the bar. Two bells — man riding.'}
   ]};
   tourcap.textContent=tour.segs[0].t; tourcap.style.display='block';
@@ -450,8 +446,8 @@ document.getElementById('go').onclick=startTour;
 document.getElementById('free').onclick=()=>{
   startEl.style.display='none';
   atSurface=true;
-  camera.position.set(stationX-42,SURF+EYE,stationZ+34);  // in the yard, the photo's vantage
-  yaw=0.35; pitch=0.02;                                   // the long facade ahead, headframe to the right
+  camera.position.set(stationX-30,SURF+EYE,stationZ-12);  // in the yard, the photo's vantage
+  yaw=-1.25; pitch=0.02;                                   // the long building ahead, headframe to the right                                   // the long facade ahead, headframe to the right
   document.getElementById('hint').style.display='block';
 };
 document.getElementById('lower').onclick=()=>{
@@ -585,13 +581,13 @@ function animate(t){
     if(atSurface){
       move(dt,true);
       let nx=camera.position.x, nz=camera.position.z;
-      // the building is solid — one long rectangle
-      if(nx>stationX-76.5&&nx<stationX-25.5&&nz>stationZ-4.5&&nz<stationZ+4.5){
-        const dw=nx-(stationX-76.5), de=(stationX-25.5)-nx,
-              ds=(stationZ+4.5)-nz, dn=nz-(stationZ-4.5);
+      // the building is solid — one long rectangle across the yard
+      if(nx>stationX-12.5&&nx<stationX+54.5&&nz>stationZ-36.5&&nz<stationZ-27.5){
+        const dw=nx-(stationX-12.5), de=(stationX+54.5)-nx,
+              ds=(stationZ-27.5)-nz, dn=nz-(stationZ-36.5);
         const m=Math.min(dw,de,ds,dn);
-        if(m===dw)nx=stationX-76.5; else if(m===de)nx=stationX-25.5;
-        else if(m===ds)nz=stationZ+4.5; else nz=stationZ-4.5;
+        if(m===dw)nx=stationX-12.5; else if(m===de)nx=stationX+54.5;
+        else if(m===ds)nz=stationZ-27.5; else nz=stationZ-36.5;
       }
       // mill, stockpiles, water towers are solid too
       for(const o of SOBS){
