@@ -145,6 +145,7 @@ for(let gx=-7;gx<=7;gx++)for(let gz=-7;gz<=7;gz++){
   if(Math.hypot(x-0,z-40)<10) continue;                 // keep spawn clear
   if(Math.abs(gx)+Math.abs(gz)===0) continue;
   const r=2.2+((gx*13+gz*7)%10)/10*2.2;
+  if(Math.abs(x)<r+3 && z>-40 && z<58) continue;   // the tram rails run here — pillars stay clear
   const sides=5+((gx+gz)&3);
   const m=new THREE.Mesh(new THREE.CylinderGeometry(r*1.05,r,5.4,sides),pilMat);
   m.position.set(x,2.7,z);
@@ -462,7 +463,7 @@ let mlook=false, mx=0, my=0;
 canvas.addEventListener('mousedown',e=>{mlook=true;mx=e.clientX;my=e.clientY;});
 addEventListener('mouseup',()=>mlook=false);
 addEventListener('mousemove',e=>{
-  if(!mlook||tour) return;
+  if(!mlook||(tour&&tour.phase!=='arrive')) return;
   yaw-=(e.clientX-mx)*0.0035; pitch-=(e.clientY-my)*0.0035;
   pitch=Math.max(-1.2,Math.min(1.2,pitch));
   mx=e.clientX; my=e.clientY;
@@ -471,7 +472,7 @@ addEventListener('mousemove',e=>{
 let tx=0,ty=0,touchLook=false;
 canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){touchLook=true;tx=e.touches[0].clientX;ty=e.touches[0].clientY;}});
 canvas.addEventListener('touchmove',e=>{
-  if(!touchLook||tour)return;
+  if(!touchLook||(tour&&tour.phase!=='arrive'))return;
   const t=e.touches[0];
   yaw-=(t.clientX-tx)*0.004; pitch-=(t.clientY-ty)*0.004;
   pitch=Math.max(-1.2,Math.min(1.2,pitch));
@@ -571,14 +572,14 @@ function animate(t){
       if(!descending){ tour.phase='exit'; tour.t0=t;
         tourcap.textContent='The 691. Cap lamp on — step off the cage.'; }
     } else if(tour.phase==='exit'){
-      const pe=Math.min(1,(t-tour.t0)/3200), sme=pe*pe*(3-2*pe);
+      const pe=Math.min(1,(t-tour.t0)/2000), sme=pe*pe*(3-2*pe);
       camera.position.set(stationX, EYE+Math.sin(t*0.009)*0.06, stationZ-sme*8);
       pitch+=(0-pitch)*Math.min(1,dt*2);
       let dy1=-yaw; dy1=Math.atan2(Math.sin(dy1),Math.cos(dy1)); yaw+=dy1*Math.min(1,dt*2);
       if(pe>=1){ tour.phase='arrive'; tour.t0=t;
         tourcap.textContent="It's yours now. Walk with ↑ or W (hold WALK on mobile) — drag to look, ← → to turn."; }
     } else if(tour.phase==='arrive'){
-      if(t-tour.t0>5600) endTour();
+      if(t-tour.t0>4200) endTour();
     }
   }
   if(descending){
@@ -586,7 +587,7 @@ function animate(t){
     if(pitch>-0.05) pitch-=dt*0.22;                  // gaze settles level as you sink
     camera.position.x=stationX; camera.position.z=stationZ;
     if(camera.position.y<=EYE){ camera.position.y=EYE; descending=false; }
-  } else if(!tour && startEl.style.display==='none'){
+  } else if((!tour||tour.phase==='arrive') && startEl.style.display==='none'){
     if(atSurface){
       move(dt,true);
       let nx=camera.position.x, nz=camera.position.z;
