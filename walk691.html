@@ -43,6 +43,17 @@
 </div>
 
 <div id="depth" class="panel">DEPTH 691′ · IRON MOUNTAIN MINE · 1962</div>
+<div id="mapwrap" class="panel" style="top:12px;right:12px;padding:8px">
+  <div style="font-family:monospace;font-size:9px;letter-spacing:.14em;color:#9fb2bd;margin-bottom:5px;text-align:center">LEVEL PLAN — 691′</div>
+  <canvas id="minimap" width="180" height="180" style="display:block"></canvas>
+  <div style="font-family:monospace;font-size:8.5px;color:#8b949c;margin-top:5px;line-height:1.7">
+    <span style="color:#bfd8ff">■</span> SHAFT STATION&nbsp;
+    <span style="color:#d9a06b">■</span> ORE CAR<br>
+    <span style="color:#c98a4a">■</span> CHUTE&nbsp;
+    <span style="color:#a9a9b0">■</span> DRILL STEEL&nbsp;
+    <span style="color:#ffb26b">▲</span> YOU
+  </div>
+</div>
 <button id="walkbtn">WALK</button>
 
 <script>
@@ -234,6 +245,30 @@ function move(dt){
 }
 let bob=0;
 
+const mm=document.getElementById('minimap').getContext('2d');
+const LM=[[0,58,'#bfd8ff'],[0,-14,'#d9a06b'],[-34,-30,'#c98a4a'],[30,22,'#a9a9b0']];
+function drawMap(){
+  const S=180, sc=S/(ROOM*2.15), cx=S/2, cy=S/2;
+  mm.clearRect(0,0,S,S);
+  // room
+  mm.beginPath(); mm.arc(cx,cy,ROOM*sc,0,7);
+  mm.fillStyle='rgba(20,26,30,0.9)'; mm.fill();
+  mm.strokeStyle='#3d5866'; mm.lineWidth=1.5; mm.stroke();
+  // pillars
+  mm.fillStyle='#4a423a';
+  for(const p of pillars){
+    mm.beginPath(); mm.arc(cx+p.x*sc, cy+p.z*sc, Math.max(1.2,p.r*sc*0.8),0,7); mm.fill();
+  }
+  // landmarks
+  for(const l of LM){ mm.fillStyle=l[2]; mm.fillRect(cx+l[0]*sc-2.5, cy+l[1]*sc-2.5, 5,5); }
+  // player arrow (heading = yaw)
+  const px=cx+camera.position.x*sc, pz=cy+camera.position.z*sc;
+  mm.save(); mm.translate(px,pz); mm.rotate(-yaw+Math.PI);
+  mm.fillStyle='#ffb26b';
+  mm.beginPath(); mm.moveTo(0,-6); mm.lineTo(4,5); mm.lineTo(-4,5); mm.closePath(); mm.fill();
+  mm.restore();
+}
+
 function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;
   if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
 let last=0;
@@ -250,6 +285,7 @@ function animate(t){
   glow.position.copy(camera.position);
   // lamp flicker
   lamp.intensity=1.55+Math.sin(t*0.013)*0.06+Math.random()*0.03;
+  drawMap();
   renderer.render(scene,camera);
 }
 animate();
