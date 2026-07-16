@@ -372,23 +372,30 @@
   /* ---------- Running-header nav ---------- */
   .sitenav {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(239,230,208,0.94);
-    backdrop-filter: blur(3px);
-    border-bottom: 1px solid var(--foxing);
+    background: #26201a;                       /* ink band — reads as chrome, not copy */
+    border-bottom: 3px double #6e2a1c;         /* hematite rule */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     font-family: 'Courier Prime', monospace;
-    font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+    font-size: 0.84rem; letter-spacing: 0.16em; text-transform: uppercase;
   }
   .sitenav .wrap {
-    display: flex; gap: 1.4rem; align-items: center;
+    display: flex; gap: 0; align-items: stretch;
     overflow-x: auto; white-space: nowrap;
-    padding-top: 0.6rem; padding-bottom: 0.6rem;
     scrollbar-width: none;
   }
   .sitenav .wrap::-webkit-scrollbar { display: none; }
-  .sitenav a { color: var(--ink-faded); text-decoration: none; }
-  .sitenav a:hover { color: var(--oxide); }
-  .sitenav a.active { color: var(--oxide); text-decoration: underline; text-underline-offset: 4px; }
-  .sitenav .totop { margin-left: auto; }
+  .sitenav a {
+    color: #d8ccb4; text-decoration: none;
+    padding: 0.75rem 1.05rem;
+    border-right: 1px solid rgba(216,204,180,0.14);
+  }
+  .sitenav a:first-child { border-left: 1px solid rgba(216,204,180,0.14); }
+  .sitenav a:hover { background: #35291f; color: #f0e6d2; }
+  .sitenav a.active {
+    background: #6e2a1c; color: #f4ead6;
+    text-decoration: none;
+  }
+  .sitenav .totop { margin-left: auto; border-right: none; color: #9a8c72; }
 </style>
 
 <style>
