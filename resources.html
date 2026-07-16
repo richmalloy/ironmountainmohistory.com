@@ -376,17 +376,19 @@
     border-bottom: 3px double #6e2a1c;         /* hematite rule */
     box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     font-family: 'Courier Prime', monospace;
-    font-size: 0.84rem; letter-spacing: 0.16em; text-transform: uppercase;
+    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
   }
   .sitenav .wrap {
     display: flex; gap: 0; align-items: stretch;
     overflow-x: auto; white-space: nowrap;
     scrollbar-width: none;
+    max-width: none; width: 100%;
+    padding-left: 0.5rem; padding-right: 0.5rem;
   }
   .sitenav .wrap::-webkit-scrollbar { display: none; }
   .sitenav a {
     color: #d8ccb4; text-decoration: none;
-    padding: 0.75rem 1.05rem;
+    padding: 0.72rem 0.9rem;
     border-right: 1px solid rgba(216,204,180,0.14);
     flex: 0 0 auto;
   }
