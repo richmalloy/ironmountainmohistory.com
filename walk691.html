@@ -7,7 +7,7 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<title>Walk the 691 Level — Iron Mountain Mine (v0.1, interpretive)</title>
+<title>Walk the 691 Level — Iron Mountain Mine (v0.2, interpretive)</title>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="137983b3-617d-41d9-9a9a-8e05851d4a97"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
@@ -53,13 +53,14 @@
 <div id="start">
   <h2>THE 691 LEVEL</h2>
   <p>Six hundred and ninety-one feet below the hoist house collar. Mined 1944&ndash;1966; abandoned with the pumps off; flooded ever since. You are walking it as it was on a working day, by cap lamp — the pillars holding the roof are the mountain's own rock, left standing by the engineers. <br><br><em>Interpretive reconstruction from Map 00224 and the Hanna series — pillar layout stylized until the high-resolution scans are traced.</em></p>
-  <button id="go">⛏ &nbsp;BOARD THE CAGE</button>
+  <button id="go">⛏ &nbsp;GO TO WORK — RIDE THE CAGE DOWN</button>
+  <button id="free" style="background:none;border:1px solid #6e2a1c;color:#d9a06b;font-size:12px;padding:9px 18px">FREE ROAM FROM THE YARD</button>
   <div class="keys">DESKTOP: drag to look · W/↑ walk · ←→ turn · A D strafe<br>MOBILE: drag to look · hold WALK to move</div>
 </div>
 
 <div id="hud" class="panel">
   <h1>691′ LEVEL</h1>
-  <div class="sub">Main Orebody · first-person · v0.1 interpretive</div>
+  <div class="sub">Main Orebody · first-person · v0.2 interpretive</div>
   <div style="margin:6px 0 2px"><a href="/mine3d.html">&larr; TIME EXPLORER</a> &nbsp; <a href="/">HISTORY</a></div>
 </div>
 
@@ -81,6 +82,8 @@
 <button id="walkbtn">WALK</button>
 <button id="lower" class="panel" style="bottom:70px;left:50%;transform:translateX(-50%);padding:12px 26px;background:rgba(138,59,42,.9);border:2px solid #d9a06b;color:#efe6d0;font-family:monospace;font-size:14px;letter-spacing:.12em;cursor:pointer;display:none">⬇ &nbsp;LOWER THE CAGE</button>
 <div id="hint" class="panel" style="bottom:64px;left:50%;transform:translateX(-50%);padding:6px 14px;font-family:monospace;font-size:10px;color:#c9a06b;letter-spacing:.12em;display:none">DRAG THE VIEW TO LOOK AROUND</div>
+<div id="tourcap" class="panel" style="bottom:110px;left:50%;transform:translateX(-50%);padding:10px 20px;max-width:min(620px,86vw);font-size:15px;line-height:1.5;text-align:center;display:none;border-color:#6e2a1c;background:rgba(8,10,12,.92)"></div>
+<button id="tourskip" class="panel" style="top:56px;left:50%;transform:translateX(-50%);padding:7px 13px;color:#d9a06b;font-family:monospace;font-size:12px;cursor:pointer;display:none">SKIP ▸</button>
 
 <script>
 const canvas=document.getElementById('c');
@@ -260,13 +263,26 @@ skyDisk.rotation.x=Math.PI/2; skyDisk.position.set(stationX,SURF+30,stationZ); s
 const yard=new THREE.Mesh(new THREE.RingGeometry(3.6,70,36),
   new THREE.MeshLambertMaterial({color:0x5a6a4a,side:THREE.DoubleSide}));
 yard.rotation.x=-Math.PI/2; yard.position.set(stationX,SURF,stationZ); scene.add(yard);
-// steel headframe over the collar
+// steel headframe over the collar — wide face toward the hoist house, sheaves edge-on in the rope plane
 const steelM=new THREE.MeshLambertMaterial({color:0x6e4438});
-[[-2.6,-2.6],[2.6,-2.6],[-2.6,2.6],[2.6,2.6]].forEach(p=>{
-  const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.24,15,6),steelM);
-  leg.position.set(stationX+p[0]*0.55,SURF+7.5,stationZ+p[1]*0.55); scene.add(leg);});
-const sdeck=new THREE.Mesh(new THREE.BoxGeometry(3.6,1.2,3.6),steelM);
-sdeck.position.set(stationX,SURF+15.4,stationZ); scene.add(sdeck);
+function sstrut(x1,y1,z1,x2,y2,z2,r){
+  const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
+  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,6),steelM);
+  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
+// battered legs: wide across the rope axis (z), narrow along it (x)
+[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
+  sstrut(stationX+p[0]*1.25,SURF,stationZ+p[1]*2.0, stationX+p[0]*0.7,SURF+15,stationZ+p[1]*1.4,0.17);});
+// backlegs toward the hoist house, feet on the rope axis
+sstrut(stationX-8.5,SURF,stationZ-1.3, stationX-0.4,SURF+14.6,stationZ-1.2,0.18);
+sstrut(stationX-8.5,SURF,stationZ+1.3, stationX-0.4,SURF+14.6,stationZ+1.2,0.18);
+const sdeck=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.0,4.4),steelM);
+sdeck.position.set(stationX,SURF+15.6,stationZ); scene.add(sdeck);
+// sheave wheels, side by side, wheel planes aligned with the ropes
+[[-0.8],[0.8]].forEach(p=>{
+  const sw=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.14,7,16),
+    new THREE.MeshLambertMaterial({color:0x3a3f45}));
+  sw.position.set(stationX,SURF+16.6,stationZ+p[0]); scene.add(sw);});
 // the brick hoist house across the yard, ropes flying to the sheaves
 const hhouse=new THREE.Group();
 const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
@@ -292,8 +308,11 @@ function srope(x1,y1,z1,x2,y2,z2){
     new THREE.MeshBasicMaterial({color:0xd8d0c0}));
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-srope(stationX-21,SURF+4.9,stationZ-0.8, stationX,SURF+15.4,stationZ-0.8);
-srope(stationX-21,SURF+4.9,stationZ+0.8, stationX,SURF+15.4,stationZ+0.8);
+srope(stationX-18,SURF+4.9,stationZ-0.8, stationX,SURF+16.6,stationZ-0.8);
+srope(stationX-18,SURF+4.9,stationZ+0.8, stationX,SURF+16.6,stationZ+0.8);
+// and down the shaft — you ride under these
+srope(stationX,SURF+16.6,stationZ-0.8, stationX,EYE+4.2,stationZ-0.8);
+srope(stationX,SURF+16.6,stationZ+0.8, stationX,EYE+4.2,stationZ+0.8);
 const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
  const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle='#efe6d0';
  g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
@@ -359,7 +378,39 @@ const goTag=(()=>{const c=document.createElement('canvas');c.width=1024;c.height
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
  sp.scale.set(20,3.9,1);sp.position.set(stationX,SURF+18.5,stationZ);scene.add(sp);return sp;})();
 let atSurface=false;
-document.getElementById('go').onclick=()=>{
+// ---------- GO TO WORK: the scripted shift-start ----------
+let tour=null;
+const tourcap=document.getElementById('tourcap'),tourskip=document.getElementById('tourskip');
+function lookYawPitch(from,to){
+  const dx=to[0]-from.x,dy=to[1]-from.y,dz=to[2]-from.z;
+  return [Math.atan2(-dx,-dz), Math.atan2(dy,Math.hypot(dx,dz))];
+}
+function startTour(){
+  startEl.style.display='none'; atSurface=true; descending=false;
+  beacon.visible=false; goTag.visible=false;
+  camera.position.set(stationX-40,SURF+EYE,stationZ+30);
+  yaw=lookYawPitch(camera.position,[stationX-24,SURF+4,stationZ])[0]; pitch=0;
+  tour={i:0,phase:'walk',t0:performance.now(),segs:[
+    {a:[stationX-40,SURF+EYE,stationZ+30], b:[stationX-16,SURF+EYE,stationZ+13], look:[stationX-24,SURF+4,stationZ], d:6.5,
+     t:'Morning shift, 1958. Clock in at the long building — then across the yard.'},
+    {a:[stationX-16,SURF+EYE,stationZ+13], b:[stationX-3,SURF+EYE,stationZ+8], look:[stationX,SURF+16,stationZ], d:5.5,
+     t:'The ropes are already singing over the sheaves. The cage is waiting at the collar.'},
+    {a:[stationX-3,SURF+EYE,stationZ+8], b:[stationX,SURF+EYE,stationZ+0.4], look:[stationX,SURF-3,stationZ], d:4.5,
+     t:'Step on. Hold the bar. Two bells — man riding.'}
+  ]};
+  tourcap.textContent=tour.segs[0].t; tourcap.style.display='block';
+  tourskip.style.display='block';
+  document.getElementById('hint').style.display='none';
+}
+function endTour(){
+  tour=null; tourcap.style.display='none'; tourskip.style.display='none';
+  document.getElementById('hint').style.display='block';
+  setTimeout(()=>document.getElementById('hint').style.display='none',6000);
+}
+tourskip.onclick=()=>{ endTour(); descending=false; atSurface=false;
+  camera.position.set(0,EYE,40); yaw=Math.PI; pitch=0; };
+document.getElementById('go').onclick=startTour;
+document.getElementById('free').onclick=()=>{
   startEl.style.display='none';
   atSurface=true;
   camera.position.set(stationX-24,SURF+EYE,stationZ+32); // in the yard, the photo's vantage
@@ -376,7 +427,7 @@ let mlook=false, mx=0, my=0;
 canvas.addEventListener('mousedown',e=>{mlook=true;mx=e.clientX;my=e.clientY;});
 addEventListener('mouseup',()=>mlook=false);
 addEventListener('mousemove',e=>{
-  if(!mlook) return;
+  if(!mlook||tour) return;
   yaw-=(e.clientX-mx)*0.0035; pitch-=(e.clientY-my)*0.0035;
   pitch=Math.max(-1.2,Math.min(1.2,pitch));
   mx=e.clientX; my=e.clientY;
@@ -385,7 +436,7 @@ addEventListener('mousemove',e=>{
 let tx=0,ty=0,touchLook=false;
 canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){touchLook=true;tx=e.touches[0].clientX;ty=e.touches[0].clientY;}});
 canvas.addEventListener('touchmove',e=>{
-  if(!touchLook)return;
+  if(!touchLook||tour)return;
   const t=e.touches[0];
   yaw-=(t.clientX-tx)*0.004; pitch-=(t.clientY-ty)*0.004;
   pitch=Math.max(-1.2,Math.min(1.2,pitch));
@@ -460,12 +511,40 @@ let last=0;
 function animate(t){
   requestAnimationFrame(animate); resize();
   const dt=Math.min(0.05,(t-last)/1000||0.016); last=t;
+  if(tour){
+    if(tour.phase==='walk'){
+      const s=tour.segs[tour.i];
+      let p=(t-tour.t0)/1000/s.d; if(p>1)p=1;
+      const sm=p*p*(3-2*p);
+      camera.position.set(
+        s.a[0]+(s.b[0]-s.a[0])*sm,
+        s.a[1]+(s.b[1]-s.a[1])*sm + Math.sin(t*0.009)*0.06,
+        s.a[2]+(s.b[2]-s.a[2])*sm);
+      const lp=lookYawPitch(camera.position,s.look);
+      let dyaw=lp[0]-yaw; dyaw=Math.atan2(Math.sin(dyaw),Math.cos(dyaw));
+      yaw+=dyaw*Math.min(1,dt*2.6); pitch+=(lp[1]-pitch)*Math.min(1,dt*2.6);
+      tourcap.textContent=s.t;
+      if(p>=1){ tour.i++; tour.t0=t;
+        if(tour.i>=tour.segs.length){
+          tour.phase='descend'; atSurface=false; descending=true;
+          camera.position.x=stationX; camera.position.z=stationZ;
+          tourcap.textContent='Down. The levels tick past — 465 · 503 · 541 · 579 · 616 · 654 — then yours.';
+        }}
+    } else if(tour.phase==='descend'){
+      pitch+=(0-pitch)*Math.min(1,dt*0.9);
+      let dy0=-yaw; dy0=Math.atan2(Math.sin(dy0),Math.cos(dy0)); yaw+=dy0*Math.min(1,dt*0.9);
+      if(!descending){ tour.phase='arrive'; tour.t0=t;
+        tourcap.textContent='The 691. Cap lamp on — the workings are ahead. Walk.'; }
+    } else if(tour.phase==='arrive'){
+      if(t-tour.t0>4200) endTour();
+    }
+  }
   if(descending){
     camera.position.y-=dt*4.6;                       // the cage drops
     if(pitch>-0.05) pitch-=dt*0.22;                  // gaze settles level as you sink
     camera.position.x=stationX; camera.position.z=stationZ;
     if(camera.position.y<=EYE){ camera.position.y=EYE; descending=false; }
-  } else if(startEl.style.display==='none'){
+  } else if(!tour && startEl.style.display==='none'){
     if(atSurface){
       move(dt,true);
       let nx=camera.position.x, nz=camera.position.z;
