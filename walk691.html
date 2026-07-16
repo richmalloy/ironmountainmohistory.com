@@ -49,7 +49,7 @@
 <div id="start">
   <h2>THE 691 LEVEL</h2>
   <p>Six hundred and ninety-one feet below the hoist house collar. Mined 1944&ndash;1966; abandoned with the pumps off; flooded ever since. You are walking it as it was on a working day, by cap lamp — the pillars holding the roof are the mountain's own rock, left standing by the engineers. <br><br><em>Interpretive reconstruction from Map 00224 and the Hanna series — pillar layout stylized until the high-resolution scans are traced.</em></p>
-  <button id="go">⛏ &nbsp;LIGHT THE LAMP</button>
+  <button id="go">⛏ &nbsp;BOARD THE CAGE</button>
   <div class="keys">DESKTOP: click to look · W/↑ walk · ←→ turn · A D strafe · ESC to release mouse<br>MOBILE: drag to look · hold WALK to move</div>
 </div>
 
@@ -59,7 +59,10 @@
   <div style="margin:6px 0 2px"><a href="/mine3d.html">&larr; TIME EXPLORER</a> &nbsp; <a href="/">HISTORY</a></div>
 </div>
 
-<div id="depth" class="panel">DEPTH 691′ · IRON MOUNTAIN MINE · 1962</div>
+<div id="depth" class="panel" style="font-size:14px">DEPTH <span id="dft" style="font-size:20px">0</span>′ · <span id="dlv">SURFACE — "B" SHAFT COLLAR</span></div>
+<div id="lite" class="panel" style="bottom:64px;left:14px;padding:7px 12px;font-family:monospace;font-size:10px;color:#9fb2bd;letter-spacing:.1em">
+  LAMP <input type="range" id="lamprange" min="40" max="260" value="100" style="width:110px;vertical-align:middle;accent-color:#ffb26b">
+</div>
 <div id="mapwrap" class="panel" style="top:56px;right:12px;padding:8px">
   <div style="font-family:monospace;font-size:9px;letter-spacing:.14em;color:#9fb2bd;margin-bottom:5px;text-align:center">LEVEL PLAN — 691′</div>
   <canvas id="minimap" width="180" height="180" style="display:block"></canvas>
@@ -204,11 +207,53 @@ const drops=new THREE.Points(
   new THREE.PointsMaterial({color:0x88aacc,size:0.06,transparent:true,opacity:0.6}));
 scene.add(drops);
 
+// ---------- the shaft & the descent ----------
+const DESC_TOP=64;                       // visual shaft height above the level
+const tube=new THREE.Mesh(new THREE.CylinderGeometry(3.4,3.4,DESC_TOP+4,10,1,true),
+  new THREE.MeshLambertMaterial({map:rockT,side:THREE.BackSide}));
+tube.position.set(stationX,(DESC_TOP+4)/2-1,stationZ); scene.add(tube);
+// guide timbers in the shaft
+[[-2.6,0],[2.6,0]].forEach(p=>{
+  const g=new THREE.Mesh(new THREE.BoxGeometry(0.3,DESC_TOP+4,0.3),
+    new THREE.MeshLambertMaterial({color:0x4a3a2c}));
+  g.position.set(stationX+p[0],(DESC_TOP+4)/2-1,stationZ+p[1]); scene.add(g);});
+// level rings passing on the way down (depths above the 691, mapped into the tube)
+const LEVELS_ABOVE=[465,503,541,579,616,654];
+function depthToY(d){ return EYE + (1-d/691)*(DESC_TOP-EYE); }
+LEVELS_ABOVE.forEach(d=>{
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(3.2,0.12,6,14),
+    new THREE.MeshBasicMaterial({color:0x6a5a44}));
+  ring.rotation.x=Math.PI/2; ring.position.set(stationX,depthToY(d),stationZ); scene.add(ring);
+  const rl=label(d+"′ LEVEL",3.2,'#c9a06b'); rl.position.set(stationX+4.2,depthToY(d),stationZ); scene.add(rl);
+});
+let descending=false, descY=DESC_TOP;
+const dft=document.getElementById('dft'), dlv=document.getElementById('dlv');
+function updateDepthHUD(){
+  const d=Math.max(0,Math.min(691, Math.round((1-(camera.position.y-EYE)/(DESC_TOP-EYE))*691)));
+  dft.textContent=d;
+  if(!descending && d>=691){ dlv.textContent='691 LEVEL · MAIN OREBODY · 1962'; return; }
+  let passing=null;
+  for(const L of LEVELS_ABOVE){ if(Math.abs(d-L)<22) passing=L; }
+  dlv.textContent = d<20 ? 'SURFACE — "B" SHAFT COLLAR'
+                  : passing ? 'PASSING THE '+passing+'′ LEVEL'
+                  : 'IN THE SHAFT — DESCENDING';
+}
+
+// ---------- lamp brightness control ----------
+let lampScale=1;
+document.getElementById('lamprange').oninput=e=>{
+  lampScale=e.target.value/100;
+  scene.fog.density=0.028/Math.sqrt(lampScale);
+};
+
 // ---------- first-person controls ----------
 let yaw=Math.PI, pitch=0, locked=false;
 const startEl=document.getElementById('start');
 document.getElementById('go').onclick=()=>{
   startEl.style.display='none';
+  descending=true;
+  camera.position.set(stationX,DESC_TOP,stationZ);
+  yaw=Math.PI; pitch=-0.15;
   if(matchMedia('(pointer:fine)').matches) canvas.requestPointerLock();
 };
 document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;});
@@ -295,7 +340,12 @@ let last=0;
 function animate(t){
   requestAnimationFrame(animate); resize();
   const dt=Math.min(0.05,(t-last)/1000||0.016); last=t;
-  if(startEl.style.display==='none') move(dt);
+  if(descending){
+    camera.position.y-=dt*4.6;                       // the cage drops
+    camera.position.x=stationX; camera.position.z=stationZ;
+    if(camera.position.y<=EYE){ camera.position.y=EYE; descending=false; }
+  } else if(startEl.style.display==='none') move(dt);
+  updateDepthHUD();
   camera.rotation.set(0,0,0);
   camera.rotateY(yaw); camera.rotateX(pitch);
   // lamp follows view
@@ -304,7 +354,8 @@ function animate(t){
   lamp.target.position.copy(camera.position).add(dir.multiplyScalar(10));
   glow.position.copy(camera.position);
   // lamp flicker
-  lamp.intensity=1.55+Math.sin(t*0.013)*0.06+Math.random()*0.03;
+  lamp.intensity=(1.55+Math.sin(t*0.013)*0.06+Math.random()*0.03)*lampScale;
+  glow.intensity=0.35*lampScale;
   drawMap();
   renderer.render(scene,camera);
 }
