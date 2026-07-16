@@ -7,7 +7,7 @@
 <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 
-<title>The Plant Through Time — Iron Mountain (v0.1, interpretive)</title>
+<title>The Plant Through Time — Iron Mountain (v0.2, interpretive)</title>
 <script defer src="https://cloud.umami.is/script.js" data-website-id="137983b3-617d-41d9-9a9a-8e05851d4a97"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
@@ -23,7 +23,20 @@
   #year{font-family:monospace;font-size:26px;color:#ffb26b;min-width:86px;text-align:center}
   #yr{flex:1} input[type=range]{accent-color:#ffb26b}
   #play{background:#8a3b2a;border:none;color:#efe6d0;padding:8px 14px;cursor:pointer;font-family:monospace;font-size:12px}
-  @media(max-width:700px){#hud{max-width:200px;font-size:12px}#year{font-size:19px;min-width:60px}}
+  #walkagain{background:none;border:1px solid #6e2a1c;color:#d9a06b;padding:4px 8px;cursor:pointer;font-family:monospace;font-size:11px;margin-top:8px}
+  #cap{left:50%;transform:translateX(-50%);bottom:84px;padding:10px 20px;max-width:min(640px,88vw);
+    font-size:15px;line-height:1.5;color:#efe6d0;text-align:center;display:none;
+    border-color:#6e2a1c;background:rgba(12,15,18,.9)}
+  #skipwalk{top:56px;right:12px;padding:7px 13px;color:#d9a06b;font-family:monospace;font-size:12px;
+    cursor:pointer;display:none;background:rgba(12,15,18,.84);border:1px solid #3a3f45}
+  #intro{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;
+    background:rgba(6,8,10,.88);z-index:20;text-align:center;padding:20px}
+  #intro h2{font-size:24px;margin:0 0 6px;letter-spacing:.06em}
+  #intro .sub2{font-family:monospace;font-size:11px;color:#9fb2bd;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px}
+  #intro p{max-width:480px;font-size:15px;color:#c9bfa8;line-height:1.65;margin:0 0 18px}
+  #gowalk{background:#8a3b2a;border:none;color:#efe6d0;padding:13px 28px;cursor:pointer;font-family:monospace;font-size:15px;letter-spacing:.08em}
+  #skipintro{background:none;border:none;color:#8b949c;font-family:monospace;font-size:11px;letter-spacing:.08em;cursor:pointer;margin-top:14px;text-decoration:underline}
+  @media(max-width:700px){#hud{max-width:200px;font-size:12px}#year{font-size:19px;min-width:60px}#cap{font-size:13px;bottom:96px}}
 </style>
 
 <style>
@@ -49,12 +62,16 @@
 <div id="hud" class="panel">
   <button id="hudx" style="float:right;background:none;border:none;color:#8b949c;font-size:16px;cursor:pointer;padding:0 2px">×</button>
   <h1>THE PLANT</h1>
-  <div class="sub">Hoist house grounds · v0.1 · interpretive</div>
+  <div class="sub">Hoist house grounds · v0.2 · interpretive</div>
   <div style="margin:6px 0 2px"><a href="/mine3d.html">&larr; TIME EXPLORER</a> · <a href="/walk691.html">WALK ⛏</a></div>
   <div id="era"></div>
+  <button id="walkagain">⛏ WALK TO THE SHAFT</button>
   <div style="font-size:10px;color:#8b949c;margin-top:8px;border-top:1px solid #3a3f45;padding-top:6px">⚠ Interpretive — building forms &amp; dates ~approximate; positions per Map 00636 &amp; RM ground-truth.</div>
 </div>
 <button id="info" class="panel" style="top:56px;left:12px;display:none;padding:6px 11px;color:#d9a06b;font-family:monospace;font-size:14px;cursor:pointer">ⓘ</button>
+
+<div id="cap" class="panel"></div>
+<button id="skipwalk">SKIP ▸</button>
 
 <div id="timebar" class="panel">
   <button id="play">▶ PLAY</button>
@@ -62,19 +79,29 @@
   <input type="range" id="yr" min="1880" max="2026" value="1900" step="1">
 </div>
 
+<div id="intro">
+  <h2>THE PLANT</h2>
+  <div class="sub2">Iron Mountain · hoist house grounds · v0.2</div>
+  <p>It's 1958. The drums are turning behind the brick, the ropes are strung across the yard, and the cage is somewhere below the 691. Walk in from the plant road and meet the shaft — then take the whole century on the slider.</p>
+  <button id="gowalk">⛏ WALK TO THE SHAFT</button>
+  <button id="skipintro">skip — straight to the timeline</button>
+</div>
+
 <script>
 const canvas=document.getElementById('c');
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x11161b);
-scene.fog=new THREE.Fog(0x11161b,120,420);
+scene.fog=new THREE.Fog(0x11161b,120,460);
 const camera=new THREE.PerspectiveCamera(55,2,0.1,1200);
-let target=new THREE.Vector3(6,6,0);
-camera.position.set(55,30,70);
+let target=new THREE.Vector3(-2,6,0);
+camera.position.set(60,34,84);
 scene.add(new THREE.AmbientLight(0xffffff,0.6));
 const sun=new THREE.DirectionalLight(0xfff2dd,0.95); sun.position.set(60,90,40); scene.add(sun);
 
-// scale: 1 unit ≈ 3 ft. Shaft at origin-ish; headframe over it; hoist house WEST (left) of headframe (RM: headframe to the right of the house).
+// scale: 1 unit ≈ 3 ft. Shaft at x=30; headframe over it; the LONG hoist house/office runs west (left) of it.
+// Per RM photo (July 2026): one long low brick building (~200 ft), red metal roof, window row along the yard face;
+// ropes enter the building at the SECOND WINDOW FROM THE LEFT (west end) — drum bay at the west end.
 const timed=[]; function T(o,s,e){timed.push({obj:o,start:s??-1e9,end:e??1e9});scene.add(o);return o;}
 function label(t,size,color){const c=document.createElement('canvas');c.width=1024;c.height=200;
  const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle=color||'#efe6d0';
@@ -83,15 +110,19 @@ function label(t,size,color){const c=document.createElement('canvas');c.width=10
  sp.scale.set(size*5.12,size,1);return sp;}
 
 // ground + faint yard grid
-const g1=new THREE.Mesh(new THREE.PlaneGeometry(300,220),
+const g1=new THREE.Mesh(new THREE.PlaneGeometry(320,240),
  new THREE.MeshLambertMaterial({color:0x53614a}));
 g1.rotation.x=-Math.PI/2; T(g1);
-const grid=new THREE.GridHelper(300,30,0x2c3a44,0x22303a);
-grid.material.transparent=true;grid.material.opacity=0.25;T(grid);
+// the gravel yard apron out front (per photo)
+const apron=new THREE.Mesh(new THREE.PlaneGeometry(150,70),
+ new THREE.MeshLambertMaterial({color:0x5c564d}));
+apron.rotation.x=-Math.PI/2; apron.position.set(-20,0.05,32); T(apron);
+const grid=new THREE.GridHelper(320,32,0x2c3a44,0x22303a);
+grid.material.transparent=true;grid.material.opacity=0.22;T(grid);
 // rail spur past the plant
-const rail=new THREE.Mesh(new THREE.BoxGeometry(300,0.15,1.4),new THREE.MeshLambertMaterial({color:0x6b6258}));
-rail.position.set(0,0.1,26); rail.rotation.y=-0.18; T(rail,1858);
-const railL=label('INTERNAL RAIL',3.5,'#a99f8c'); railL.position.set(-56,2.5,36); T(railL,1858);
+const rail=new THREE.Mesh(new THREE.BoxGeometry(320,0.15,1.4),new THREE.MeshLambertMaterial({color:0x6b6258}));
+rail.position.set(0,0.1,-34); rail.rotation.y=-0.06; T(rail,1858);
+const railL=label('INTERNAL RAIL',3.5,'#a99f8c'); railL.position.set(-56,2.5,-38); T(railL,1858);
 
 // ===== ERA 1: wooden works ~1885–1923 =====
 const wood=new THREE.Group();
@@ -122,29 +153,61 @@ collar.position.set(30,0.4,0); T(collar,1923,1951);
 const colL=label('BARE COLLAR — the idle years',4,'#8b949c'); colL.position.set(30,4,8); T(colL,1930,1944);
 
 // ===== ERA 2: the brick plant, ~1951–present =====
-// long brick building: hoist room (east end) + office/post office (west end)
+// THE LONG BUILDING — per RM photo: ~200 ft continuous under one ridge, window row facing the yard (+z),
+// drum bay at the WEST (left) end where the ropes pass through the wall at the 2nd window from the left.
 const brick=new THREE.MeshLambertMaterial({color:0x8a5040});
 const bldg=new THREE.Group();
-// one LONG lean building (per 2020 aerial): hoist room (taller, east end) + office wing, continuous
-const hoistRoom=new THREE.Mesh(new THREE.BoxGeometry(14,8.5,9),brick); hoistRoom.position.set(-13,4.25,0); bldg.add(hoistRoom);
-const office=new THREE.Mesh(new THREE.BoxGeometry(32,7,8.6),brick); office.position.set(-36,3.5,0); bldg.add(office);
+const mainB=new THREE.Mesh(new THREE.BoxGeometry(68,7,9),brick); mainB.position.set(-38,3.5,0); bldg.add(mainB);
+// slightly taller drum bay, west end (the ropes' end)
+const drumBay=new THREE.Mesh(new THREE.BoxGeometry(16,8.6,9),brick); drumBay.position.set(-64,4.3,0); bldg.add(drumBay);
+// window row along the yard face (from the photo: long even rhythm of openings)
+const winM=new THREE.MeshLambertMaterial({color:0xcfd8dd,emissive:0x18262e});
+for(let i=0;i<13;i++){
+  const x=-69+i*5.2;
+  if(i===1) continue;                 // 2nd window from the left = the rope portal
+  if(Math.abs(x+30)<6.5) continue;    // glass-block band lives here
+  const w=new THREE.Mesh(new THREE.BoxGeometry(1.7,2.1,0.26),winM);
+  w.position.set(x,3.9,4.55); bldg.add(w);
+}
+// the rope portal — 2nd window from the left, up on the drum-bay wall
+const portal=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.8,0.32),new THREE.MeshLambertMaterial({color:0x14181c}));
+portal.position.set(-63.8,5.9,4.55); bldg.add(portal);
+const hood=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.5,1.6),new THREE.MeshLambertMaterial({color:0x3a3f45}));
+hood.position.set(-63.8,7.5,5.1); bldg.add(hood);
 // glass block band (the Christmas window wall)
 const glass=new THREE.Mesh(new THREE.BoxGeometry(12,2.2,0.3),
  new THREE.MeshLambertMaterial({color:0xbfd8e8,emissive:0x224455}));
-glass.position.set(-36,4.5,4.5); bldg.add(glass);
-// gable roofs: gray era, then red metal (aerial) after 1997
+glass.position.set(-30,4.3,4.55); bldg.add(glass);
+// gable roofs: gray era, then red metal (photo/aerial) after 1997
 function gable(len,wid,x,y,color){
  const g=new THREE.Mesh(new THREE.CylinderGeometry(wid*0.62,wid*0.62,len,3),
   new THREE.MeshLambertMaterial({color}));
- g.rotation.z=Math.PI/2; g.rotation.x=Math.PI; g.position.set(x,y,0); g.scale.y=1; return g;}
-const rGray1=gable(15,9,-13,9.4,0x5a4a44), rGray2=gable(33,8.6,-36,8.1,0x5a4a44);
-const rRed1 =gable(15,9,-13,9.4,0x7a2a28), rRed2 =gable(33,8.6,-36,8.1,0x7a2a28);
-bldg.add(rGray1,rGray2); T(bldg,1951);
-const redRoofs=new THREE.Group(); redRoofs.add(rRed1.clone(),rRed2.clone()); T(redRoofs,1997);
-// hide gray roofs in red era via timed overlay trick: gray roofs as separate timed group
-bldg.remove(rGray1); bldg.remove(rGray2);
-const grayRoofs=new THREE.Group(); grayRoofs.add(rGray1,rGray2); T(grayRoofs,1951,1997);
-const bL=label('BRICK HOIST HOUSE + OFFICE (P.O. until 1978)',4.2,'#e8c9a0'); bL.position.set(-26,12,9); T(bL,1951);
+ g.rotation.z=Math.PI/2; g.rotation.x=Math.PI; g.position.set(x,y,0); return g;}
+T(bldg,1951);
+const grayRoofs=new THREE.Group(); grayRoofs.add(gable(69,9,-38,8.1,0x5a4a44),gable(17,9,-64,9.5,0x5a4a44)); T(grayRoofs,1951,1997);
+const redRoofs=new THREE.Group();  redRoofs.add(gable(69,9,-38,8.1,0x6e2a24),gable(17,9,-64,9.5,0x6e2a24)); T(redRoofs,1997);
+const bL=label('THE LONG BUILDING — hoist drums, office, P.O. (until 1978)',4.0,'#e8c9a0'); bL.position.set(-38,13,9); T(bL,1951);
+
+// flagpole out front (per photo) + landscaping shrubs, modern office era
+const fpole=new THREE.Group();
+const fp=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.14,13,6),new THREE.MeshLambertMaterial({color:0xb8b8b8}));
+fp.position.y=6.5; fpole.add(fp);
+const flag=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.5,0.06),new THREE.MeshLambertMaterial({color:0x9a3038}));
+flag.position.set(1.3,12,0); fpole.add(flag);
+const canton=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.75,0.08),new THREE.MeshLambertMaterial({color:0x2a3a6e}));
+canton.position.set(0.65,12.37,0); fpole.add(canton);
+fpole.position.set(-16,0,13); T(fpole,1951);
+for(let i=0;i<6;i++){
+  const sh=new THREE.Mesh(new THREE.SphereGeometry(1.15,8,7),new THREE.MeshLambertMaterial({color:0x3e5a34}));
+  sh.position.set(-58+i*8.5,0.9,7.5); sh.scale.y=0.85; T(sh,1997);
+}
+// white rail fence at the west approach (per photo)
+const fence=new THREE.Group();
+for(let i=0;i<4;i++){const post=new THREE.Mesh(new THREE.BoxGeometry(0.28,2.4,0.28),
+  new THREE.MeshLambertMaterial({color:0xe8e4da})); post.position.set(-84+i*3.4,1.2,14); fence.add(post);}
+[[1.85],[0.95]].forEach(h=>{const r=new THREE.Mesh(new THREE.BoxGeometry(10.6,0.22,0.22),
+  new THREE.MeshLambertMaterial({color:0xe8e4da})); r.position.set(-78.9,h[0],14); fence.add(r);});
+T(fence,1997);
 
 // steel headframe over the shaft (east of / right of the house — per RM)
 const steel=new THREE.MeshLambertMaterial({color:0x6e4438});
@@ -166,19 +229,24 @@ const sdeck=new THREE.Mesh(new THREE.BoxGeometry(5,1.6,5),steel); sdeck.position
  sh.position.set(0,27.6,p[0]); sh.rotation.y=Math.PI/2; shf.add(sh);});
 shf.position.set(30,0,0); T(shf,1951);
 const hfL=label('STEEL HEADFRAME — "B" SHAFT',4.5,'#ffb26b'); hfL.position.set(30,31,7); T(hfL,1951);
-// hoist ropes: house -> sheaves -> shaft (working era only)
-function rope(x1,y1,z1,x2,y2,z2){
+// hoist ropes: out of the wall at the 2nd window from the left -> across the yard -> sheaves -> shaft (working era)
+function rope(x1,y1,z1,x2,y2,z2,r){
  const dir=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const len=dir.length();
- const m=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,len,4),
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(r||0.07,r||0.07,len,4),
   new THREE.MeshBasicMaterial({color:0xd8d0c0}));
  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); return m;}
-T(rope(-7,7,-0.9, 30,27.6,-0.9),1951,1966);
-T(rope(-7,7, 0.9, 30,27.6, 0.9),1951,1966);
+T(rope(-64.5,5.9,4.6, 30,27.6,-0.9),1951,1966);
+T(rope(-63.1,5.9,4.6, 30,27.6, 0.9),1951,1966);
 T(rope(30,27.6,-0.9,30,1,-0.9),1951,1966);
 T(rope(30,27.6, 0.9,30,1, 0.9),1951,1966);
-const ropeL=label('ROPES CROSSING THE YARD — drums in the house, sheaves on the frame',3.4,'#d8d0c0'); ropeL.position.set(10,20,-5); T(ropeL,1954,1966);
-const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(10,20,-5); T(endL,1966,1970);
+const ropeL=label('THE ROPES — out the wall by the 2nd window, across the yard to the sheaves',3.2,'#d8d0c0'); ropeL.position.set(-16,22,4); T(ropeL,1954,1966);
+const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(-16,20,4); T(endL,1966,1970);
+// the service line that still runs to that same corner of the building today (per photo)
+const svc=rope(6,12.5,26, -62.5,7.2,4.7, 0.035); svc.material=new THREE.MeshBasicMaterial({color:0x222426});
+T(svc,1951);
+const svcPole=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.22,13,6),new THREE.MeshLambertMaterial({color:0x4a3d30}));
+svcPole.position.set(6,6.5,26); T(svcPole,1951);
 
 // water towers east of headframe (extant)
 [[42,2.8,2.8,24,true],[48,-3,1.9,9,false]].forEach(t=>{ // big tower rivals the headframe; small tank squat
@@ -194,53 +262,51 @@ const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(
 });
 const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(45,19,0); T(wtL,1951);
 
-// THICKENER behind (west of) the house — octagonal ring; fills with rock ~1968
+// THICKENER behind (west of) the long building — octagonal ring; fills with rock ~1968
 const oct=new THREE.Mesh(new THREE.TorusGeometry(4.2,0.6,6,8),
  new THREE.MeshLambertMaterial({color:0x9a998c}));
-oct.rotation.x=Math.PI/2; oct.position.set(-50,0.6,-6); T(oct,1951);
+oct.rotation.x=Math.PI/2; oct.position.set(-84,0.6,-10); T(oct,1951);
 // rakes turning (working era) — two arms
 const rakes=new THREE.Group();
 [[0],[Math.PI/2]].forEach(a=>{const arm=new THREE.Mesh(new THREE.BoxGeometry(7.6,0.25,0.4),
  new THREE.MeshLambertMaterial({color:0x555a60})); arm.rotation.y=a[0]; rakes.add(arm);});
-rakes.position.set(-50,1.1,-6); T(rakes,1951,1967);
+rakes.position.set(-84,1.1,-10); T(rakes,1951,1967);
 // rock fill after closure
 const fill=new THREE.Mesh(new THREE.ConeGeometry(3.9,1.6,8),
  new THREE.MeshLambertMaterial({color:0x6e6a60}));
-fill.position.set(-50,0.8,-6); T(fill,1968);
-const thL=label('THICKENER — mine-water clarifier',3.8,'#c9c2ae'); thL.position.set(-50,5,0); T(thL,1951,1967);
-const thL2=label('THICKENER — rock-filled at closure',3.8,'#9a998c'); thL2.position.set(-50,5,0); T(thL2,1968);
+fill.position.set(-84,0.8,-10); T(fill,1968);
+const thL=label('THICKENER — mine-water clarifier',3.8,'#c9c2ae'); thL.position.set(-84,5,-4); T(thL,1951,1967);
+const thL2=label('THICKENER — rock-filled at closure',3.8,'#9a998c'); thL2.position.set(-84,5,-4); T(thL2,1968);
 
 // the MILL — tiered gravity mill ADJACENT to the headframe (per the Ozark Ore hero photo); burns 1978
 const millMat=new THREE.MeshLambertMaterial({color:0x5f5346});
 const mill=new THREE.Group();
-// tall compact mill block (per hero photo): ~4 stories, dark, vertical
 const m1=new THREE.Mesh(new THREE.BoxGeometry(11,17,10),millMat); m1.position.set(0,8.5,0); mill.add(m1);
 const m2=new THREE.Mesh(new THREE.BoxGeometry(8,12,9),millMat);   m2.position.set(9,6,0);   mill.add(m2);
 const m3=new THREE.Mesh(new THREE.BoxGeometry(7,7,8),millMat);    m3.position.set(15.5,3.5,0); mill.add(m3);
 [[0,17.4,11.5],[9,12.4,8.5],[15.5,7.4,7.5]].forEach(p=>{
   const rf=new THREE.Mesh(new THREE.BoxGeometry(p[2],0.6,10.2),new THREE.MeshLambertMaterial({color:0x453c33}));
   rf.position.set(p[0],p[1],0); mill.add(rf);});
-// the inclined ore-bridge conveyor descending from the mill top out over the stockpiles (hero's signature)
 const conv=new THREE.Mesh(new THREE.BoxGeometry(34,1.1,2.2),millMat);
-conv.position.set(20,10,4); conv.rotation.z=-0.42; conv.rotation.y=0.25; mill.add(conv);
-mill.position.set(38,0,-14); T(mill,1944,1978);
+conv.position.set(20,10,-4); conv.rotation.z=-0.42; conv.rotation.y=-0.25; mill.add(conv);
+mill.position.set(38,0,-16); T(mill,1944,1978);
 // stockpiles under the conveyor's end (working era)
-[[68,-4,10,6],[78,-12,13,7.5],[61,-16,8,5]].forEach(p=>{
+[[68,-26,10,6],[78,-34,13,7.5],[61,-38,8,5]].forEach(p=>{
   const sp=new THREE.Mesh(new THREE.ConeGeometry(p[2],p[3],9),
     new THREE.MeshLambertMaterial({color:0x6e5a4c}));
   sp.position.set(p[0],p[3]/2,p[1]); T(sp,1944,1980);});
-const millL=label('THE MILL — ore fed from the headframe, stepping down by gravity',3.9,'#c9c2ae'); millL.position.set(46,19,-14); T(millL,1944,1978);
-const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(44,13,-10); T(f78,1978,1982);
+const millL=label('THE MILL — ore fed from the headframe, stepping down by gravity',3.9,'#c9c2ae'); millL.position.set(46,19,-16); T(millL,1944,1978);
+const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(44,13,-12); T(f78,1978,1982);
 // rail BEHIND the mill (per RM) with ore cars, loading out concentrates
 const millRail=new THREE.Mesh(new THREE.BoxGeometry(120,0.15,1.4),new THREE.MeshLambertMaterial({color:0x6b6258}));
-millRail.position.set(44,0.1,-24); T(millRail,1944);
+millRail.position.set(44,0.1,-34); T(millRail,1944);
 for(let i=0;i<3;i++){
   const ocar=new THREE.Mesh(new THREE.BoxGeometry(4,1.6,2),new THREE.MeshLambertMaterial({color:0x54443a}));
-  ocar.position.set(42+i*5.5,0.9,-24); T(ocar,1944,1978);
+  ocar.position.set(42+i*5.5,0.9,-34); T(ocar,1944,1978);
 }
 
 // quarry-era touch
-const doNotL=label('WORKING QUARRY OFFICE — today',4,'#b8ab90'); doNotL.position.set(-26,14,9); T(doNotL,1997);
+const doNotL=label('WORKING QUARRY OFFICE — today',4,'#b8ab90'); doNotL.position.set(-38,16,9); T(doNotL,1997);
 
 // era captions
 const ERAS=[
@@ -249,11 +315,11 @@ const ERAS=[
  [1923,1930,'★ 1923: a gasoline torch explodes at 1 a.m. The wooden hoist house and tower burn; blazing timbers fall into the shaft; twenty men escape by a days-old tunnel.'],
  [1930,1944,'The Depression. A bare collar and the wind.'],
  [1944,1951,'Wartime revival — the mill rises; the modern plant takes shape.'],
- [1951,1954,'The brick era: hoist house, office (with the post office), steel headframe, tanks, thickener.'],
- [1954,1966,'All-underground. The ropes run day and night; the thickener rakes creep; the drums turn behind the brick.'],
+ [1951,1954,'The brick era: one long building — drums, office, the post office — plus steel headframe, tanks, thickener.'],
+ [1954,1966,'All-underground. The ropes leave the wall by the second window, cross the yard day and night; the thickener rakes creep.'],
  [1966,1978,'1966: the last cage. Ropes still. The thickener fills with rock. The quarry idea stirs (Elder), then the Malloys arrive — and the office becomes a home.'],
  [1978,1997,'★ 1978: the mill burns; the headframe stands. The Malloy quarry years — IMTR thrives around the surviving plant.'],
- [1997,2027,'Weber, then New Frontier. The brick building works on as the quarry office; headframe, tanks and thickener ring keep their posts. Nothing here has stopped being useful since 1846.']
+ [1997,2027,'Weber, then New Frontier, now Martin Marietta. The long building works on as the quarry office; headframe, tanks and thickener ring keep their posts. Nothing here has stopped being useful since 1846.']
 ];
 
 // time engine
@@ -269,25 +335,53 @@ setYear(1900);
 document.getElementById('hudx').onclick=()=>{document.getElementById('hud').style.display='none';document.getElementById('info').style.display='block';};
 document.getElementById('info').onclick=()=>{document.getElementById('hud').style.display='block';document.getElementById('info').style.display='none';};
 
+// ===== THE WALK-IN: first person, 1958, plant road to the collar =====
+const capEl=document.getElementById('cap'),skipBtn=document.getElementById('skipwalk');
+let walk=null;
+const V=(a)=>new THREE.Vector3(a[0],a[1],a[2]);
+function startWalk(){
+  document.getElementById('intro').style.display='none';
+  playing=false;playBtn.textContent='▶ PLAY';
+  slider.value=1958; setYear(1958);
+  walk={i:0,t0:performance.now(),segs:[
+   {a:[-56,1.9,96], b:[-44,1.9,64], la:[-38,5,0],  lb:[-38,5,0],  d:7.0, t:'The plant road, 1958. Ahead on your left — two hundred feet of brick under one long roof. Drums, office, the post office.'},
+   {a:[-44,1.9,64], b:[-18,1.9,36], la:[-38,5,0],  lb:[-63.8,6,4],d:7.0, t:'There — the ropes leave the building by the second window from the left and climb across the yard.'},
+   {a:[-18,1.9,36], b:[12,1.9,16],  la:[-63.8,6,4],lb:[30,26,0],  d:7.0, t:'The steel headframe over "B" Shaft. Riveted legs, sheaves turning, rope singing.'},
+   {a:[12,1.9,16],  b:[25,1.9,7],   la:[30,26,0],  lb:[30,1.5,0], d:5.5, t:'The collar. Under your boots: 691 feet of cage guides and dark.'},
+   {a:[25,1.9,7],   b:[60,34,84],   la:[30,1.5,0], lb:[-2,6,0],   d:5.0, t:'— now take the years.', fly:true}
+  ]};
+  capEl.style.display='block'; capEl.textContent=walk.segs[0].t;
+  skipBtn.style.display='block';
+}
+function endWalk(){
+  walk=null; capEl.style.display='none'; skipBtn.style.display='none';
+  camera.position.set(60,34,84); target.set(-2,6,0);
+  sph.setFromVector3(camera.position.clone().sub(target));
+}
+skipBtn.onclick=endWalk;
+document.getElementById('gowalk').onclick=startWalk;
+document.getElementById('walkagain').onclick=startWalk;
+document.getElementById('skipintro').onclick=()=>{document.getElementById('intro').style.display='none';};
+
 // orbit controls
 let sph=new THREE.Spherical().setFromVector3(camera.position.clone().sub(target));
 let dragging=false,panning=false,px=0,py=0;
-canvas.addEventListener('pointerdown',e=>{dragging=true;panning=e.shiftKey||e.button===2;px=e.clientX;py=e.clientY;});
+canvas.addEventListener('pointerdown',e=>{if(walk)return;dragging=true;panning=e.shiftKey||e.button===2;px=e.clientX;py=e.clientY;});
 addEventListener('pointerup',()=>dragging=false);
-addEventListener('pointermove',e=>{if(!dragging)return;
+addEventListener('pointermove',e=>{if(!dragging||walk)return;
  const dx=(e.clientX-px)/innerWidth,dy=(e.clientY-py)/innerHeight;px=e.clientX;py=e.clientY;
  if(panning){const right=new THREE.Vector3().setFromMatrixColumn(camera.matrix,0);
   const up=new THREE.Vector3().setFromMatrixColumn(camera.matrix,1);
   target.addScaledVector(right,-dx*sph.radius*1.4);target.addScaledVector(up,dy*sph.radius*1.4);
  }else{sph.theta-=dx*Math.PI*2;sph.phi-=dy*Math.PI;
   sph.phi=Math.max(0.08,Math.min(Math.PI/2-0.02,sph.phi));}});
-canvas.addEventListener('wheel',e=>{e.preventDefault();
- sph.radius*=(1+Math.sign(e.deltaY)*0.08);sph.radius=Math.max(12,Math.min(300,sph.radius));},{passive:false});
+canvas.addEventListener('wheel',e=>{e.preventDefault();if(walk)return;
+ sph.radius*=(1+Math.sign(e.deltaY)*0.08);sph.radius=Math.max(12,Math.min(320,sph.radius));},{passive:false});
 canvas.addEventListener('contextmenu',e=>e.preventDefault());
 let lastPinch=0;
-canvas.addEventListener('touchmove',e=>{if(e.touches.length===2){
+canvas.addEventListener('touchmove',e=>{if(walk)return;if(e.touches.length===2){
  const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
- if(lastPinch)sph.radius=Math.max(12,Math.min(300,sph.radius*(lastPinch/d)));
+ if(lastPinch)sph.radius=Math.max(12,Math.min(320,sph.radius*(lastPinch/d)));
  lastPinch=d;e.preventDefault();}},{passive:false});
 canvas.addEventListener('touchend',()=>lastPinch=0);
 
@@ -295,14 +389,29 @@ function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;
  if(canvas.width!==w||canvas.height!==h){renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}}
 let lastTick=0;
 function animate(t){requestAnimationFrame(animate);resize();
- sph.theta+=0.0011;
+ if(walk){
+   const s=walk.segs[walk.i];
+   let p=(t-walk.t0)/1000/s.d; if(p>1)p=1;
+   const sm=p*p*(3-2*p);
+   const pos=V(s.a).lerp(V(s.b),sm);
+   if(!s.fly)pos.y+=Math.sin(t*0.009)*0.09;   // boots on gravel
+   camera.position.copy(pos);
+   const look=V(s.la).lerp(V(s.lb),sm);
+   camera.lookAt(look);
+   capEl.textContent=s.t;
+   if(p>=1){walk.i++;walk.t0=t;
+     if(walk.i>=walk.segs.length)endWalk();}
+ }else{
+   sph.theta+=0.0011;
+   camera.position.setFromSpherical(sph).add(target);
+   camera.lookAt(target);
+ }
  if(playing&&t-lastTick>150){lastTick=t;let y=+slider.value+1;
   if(y>2026){y=2026;playing=false;playBtn.textContent='▶ PLAY';}
   slider.value=y;setYear(y);}
  // rakes turn while working
  if(typeof rakes!=='undefined'&&rakes.visible)rakes.rotation.y+=0.004;
- camera.position.setFromSpherical(sph).add(target);
- camera.lookAt(target);renderer.render(scene,camera);}
+ renderer.render(scene,camera);}
 animate();
 </script>
 </body>
