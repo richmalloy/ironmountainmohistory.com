@@ -54,7 +54,7 @@
   <h2>THE 691 LEVEL</h2>
   <p>Six hundred and ninety-one feet below the hoist house collar. Mined 1944&ndash;1966; abandoned with the pumps off; flooded ever since. You are walking it as it was on a working day, by cap lamp — the pillars holding the roof are the mountain's own rock, left standing by the engineers. <br><br><em>Interpretive reconstruction from Map 00224 and the Hanna series — pillar layout stylized until the high-resolution scans are traced.</em></p>
   <button id="go">⛏ &nbsp;BOARD THE CAGE</button>
-  <div class="keys">DESKTOP: click the view to take the controls (ESC releases) · W/↑ walk · ←→ turn · A D strafe<br>MOBILE: drag to look · hold WALK to move</div>
+  <div class="keys">DESKTOP: drag to look · W/↑ walk · ←→ turn · A D strafe<br>MOBILE: drag to look · hold WALK to move</div>
 </div>
 
 <div id="hud" class="panel">
@@ -80,7 +80,7 @@
 </div>
 <button id="walkbtn">WALK</button>
 <button id="lower" class="panel" style="bottom:70px;left:50%;transform:translateX(-50%);padding:12px 26px;background:rgba(138,59,42,.9);border:2px solid #d9a06b;color:#efe6d0;font-family:monospace;font-size:14px;letter-spacing:.12em;cursor:pointer;display:none">⬇ &nbsp;LOWER THE CAGE</button>
-<div id="hint" class="panel" style="bottom:64px;left:50%;transform:translateX(-50%);padding:6px 14px;font-family:monospace;font-size:10px;color:#c9a06b;letter-spacing:.12em;display:none">CLICK THE VIEW TO TAKE THE CONTROLS · ESC RELEASES</div>
+<div id="hint" class="panel" style="bottom:64px;left:50%;transform:translateX(-50%);padding:6px 14px;font-family:monospace;font-size:10px;color:#c9a06b;letter-spacing:.12em;display:none">DRAG THE VIEW TO LOOK AROUND</div>
 
 <script>
 const canvas=document.getElementById('c');
@@ -273,11 +273,11 @@ const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
 // hoist room: the taller end, nearest the shaft
 const hb1=new THREE.Mesh(new THREE.BoxGeometry(12,5.6,8),brickM); hb1.position.set(0,2.8,0); hhouse.add(hb1);
 // office wing: LONG (per the Weber-era aerial) — one continuous building
-const hb2=new THREE.Mesh(new THREE.BoxGeometry(26,4.6,7.4),brickM); hb2.position.set(-19,2.3,0); hhouse.add(hb2);
+const hb2=new THREE.Mesh(new THREE.BoxGeometry(46,4.6,7.4),brickM); hb2.position.set(-29,2.3,0); hhouse.add(hb2);
 const hr1=new THREE.Mesh(new THREE.BoxGeometry(13,0.7,9),new THREE.MeshLambertMaterial({color:0x5a4a44}));
 hr1.position.set(0,6.1,0); hhouse.add(hr1);
-const hr2=new THREE.Mesh(new THREE.BoxGeometry(27,0.7,8.4),new THREE.MeshLambertMaterial({color:0x5a4a44}));
-hr2.position.set(-19,5.3,0); hhouse.add(hr2);
+const hr2=new THREE.Mesh(new THREE.BoxGeometry(47,0.7,8.4),new THREE.MeshLambertMaterial({color:0x5a4a44}));
+hr2.position.set(-29,5.3,0); hhouse.add(hr2);
 hhouse.position.set(stationX-24,SURF,stationZ); scene.add(hhouse);
 function srope(x1,y1,z1,x2,y2,z2){
   const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
@@ -292,7 +292,7 @@ const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=2
  g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
  g.fillText('THE HOIST HOUSE & OFFICE — the ropes run from here',14,100);
  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
- sp.scale.set(22,4.3,1);sp.position.set(stationX-28,SURF+9.5,stationZ);scene.add(sp);return sp;})();
+ sp.scale.set(22,4.3,1);sp.position.set(stationX-40,SURF+10,stationZ);scene.add(sp);return sp;})();
 const dayLight=new THREE.PointLight(0xeaf2ff,1.4,50);
 dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
@@ -339,14 +339,14 @@ for(let i=0;i<LPATH.length;i++){
       new THREE.Vector3(lx-px,0,lz-pz).normalize()); scene.add(wire); }
 }
 // ---------- first-person controls ----------
-let yaw=Math.PI, pitch=0, locked=false;
+let yaw=Math.PI, pitch=0;
 const startEl=document.getElementById('start');
 let atSurface=false;
 document.getElementById('go').onclick=()=>{
   startEl.style.display='none';
   atSurface=true;
-  camera.position.set(stationX+1.2,SURF+EYE,stationZ+2.5);
-  yaw=Math.PI*0.78; pitch=0.08;                         // taking in the yard & house
+  camera.position.set(stationX+8,SURF+EYE,stationZ+6);
+  yaw=1.32; pitch=0.02;                                 // facing the hoist house across the yard
   document.getElementById('lower').style.display='block';
   document.getElementById('hint').style.display='block';
 };
@@ -355,13 +355,15 @@ document.getElementById('lower').onclick=()=>{
   atSurface=false; descending=true;
   camera.position.x=stationX; camera.position.z=stationZ;
 };
-document.addEventListener('pointerlockchange',()=>{locked=document.pointerLockElement===canvas;
-  document.getElementById('hint').style.display = locked?'none':'block';});
-canvas.addEventListener('click',()=>{ if(!locked && startEl.style.display==='none' && matchMedia('(pointer:fine)').matches) canvas.requestPointerLock(); });
+// drag-to-look (desktop) — no pointer capture, cursor always free
+let mlook=false, mx=0, my=0;
+canvas.addEventListener('mousedown',e=>{mlook=true;mx=e.clientX;my=e.clientY;});
+addEventListener('mouseup',()=>mlook=false);
 addEventListener('mousemove',e=>{
-  if(!locked) return;
-  yaw-=e.movementX*0.0022; pitch-=e.movementY*0.0022;
+  if(!mlook) return;
+  yaw-=(e.clientX-mx)*0.0035; pitch-=(e.clientY-my)*0.0035;
   pitch=Math.max(-1.2,Math.min(1.2,pitch));
+  mx=e.clientX; my=e.clientY;
 });
 // touch look
 let tx=0,ty=0,touchLook=false;
