@@ -10,7 +10,7 @@
   html,body{margin:0;height:100%;overflow:hidden;background:#050607;font-family:Georgia,serif;color:#efe6d0}
   #c{display:block;width:100%;height:100%}
   .panel{position:fixed;background:rgba(8,10,12,.86);border:1px solid #3a3f45;backdrop-filter:blur(4px)}
-  #hud{top:12px;left:12px;padding:12px 14px;max-width:290px;font-size:13px;line-height:1.45}
+  #hud{top:56px;left:12px;padding:12px 14px;max-width:290px;font-size:13px;line-height:1.45}
   #hud h1{font-size:15px;margin:0 0 2px;letter-spacing:.04em}
   #hud .sub{font-family:monospace;font-size:10px;color:#9fb2bd;letter-spacing:.12em;text-transform:uppercase}
   #hud a{color:#d9a06b;font-family:monospace;font-size:11px;letter-spacing:.08em;text-decoration:none}
@@ -24,8 +24,25 @@
   #vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,.75) 100%)}
   @media(pointer:coarse){ #walkbtn{display:block} }
 </style>
+
+<style>
+  .sitenav{position:fixed;top:0;left:0;right:0;z-index:60;background:#26201a;
+    border-bottom:3px double #6e2a1c;box-shadow:0 2px 10px rgba(0,0,0,.35);
+    font-family:'Courier Prime','Courier New',monospace;font-size:0.74rem;
+    letter-spacing:0.12em;text-transform:uppercase}
+  .sitenav .navrow{display:flex;align-items:stretch;overflow-x:auto;white-space:nowrap;
+    max-width:1080px;margin:0 auto;padding:0 .5rem;scrollbar-width:none}
+  .sitenav .navrow::-webkit-scrollbar{display:none}
+  .sitenav a{color:#d8ccb4;text-decoration:none;padding:.62rem .8rem;flex:0 0 auto;
+    border-right:1px solid rgba(216,204,180,.14)}
+  .sitenav a:first-child{border-left:1px solid rgba(216,204,180,.14)}
+  .sitenav a:hover{background:#35291f;color:#f0e6d2}
+  .sitenav a.active{background:#6e2a1c;color:#f4ead6}
+</style>
 </head>
 <body>
+<nav class="sitenav"><div class="navrow"><a href="/#timeline">Timeline</a><a href="/#plates">Plates</a><a href="/#landmarks">Landscape</a><a href="/#open-questions">Open Questions</a><a href="/resources.html">Resources</a><a href="/mine3d.html">Time Explorer</a><a href="/walk691.html" class="active">Walk the Mine</a><a href="/plant.html">The Plant</a></div></nav>
+
 <canvas id="c"></canvas>
 <div id="vignette"></div>
 
@@ -43,7 +60,7 @@
 </div>
 
 <div id="depth" class="panel">DEPTH 691′ · IRON MOUNTAIN MINE · 1962</div>
-<div id="mapwrap" class="panel" style="top:12px;right:12px;padding:8px">
+<div id="mapwrap" class="panel" style="top:56px;right:12px;padding:8px">
   <div style="font-family:monospace;font-size:9px;letter-spacing:.14em;color:#9fb2bd;margin-bottom:5px;text-align:center">LEVEL PLAN — 691′</div>
   <canvas id="minimap" width="180" height="180" style="display:block"></canvas>
   <div style="font-family:monospace;font-size:8.5px;color:#8b949c;margin-top:5px;line-height:1.7">
