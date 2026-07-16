@@ -188,15 +188,7 @@ const grayRoofs=new THREE.Group(); grayRoofs.add(gable(69,9,-38,8.1,0x5a4a44),ga
 const redRoofs=new THREE.Group();  redRoofs.add(gable(69,9,-38,8.1,0x6e2a24),gable(17,9,-64,9.5,0x6e2a24)); T(redRoofs,1997);
 const bL=label('THE LONG BUILDING — hoist drums, office, P.O. (until 1978)',4.0,'#e8c9a0'); bL.position.set(-38,13,9); T(bL,1951);
 
-// flagpole out front (per photo) + landscaping shrubs, modern office era
-const fpole=new THREE.Group();
-const fp=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.14,13,6),new THREE.MeshLambertMaterial({color:0xb8b8b8}));
-fp.position.y=6.5; fpole.add(fp);
-const flag=new THREE.Mesh(new THREE.BoxGeometry(2.4,1.5,0.06),new THREE.MeshLambertMaterial({color:0x9a3038}));
-flag.position.set(1.3,12,0); fpole.add(flag);
-const canton=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.75,0.08),new THREE.MeshLambertMaterial({color:0x2a3a6e}));
-canton.position.set(0.65,12.37,0); fpole.add(canton);
-fpole.position.set(-16,0,13); T(fpole,1951);
+// landscaping shrubs, modern office era
 for(let i=0;i<6;i++){
   const sh=new THREE.Mesh(new THREE.SphereGeometry(1.15,8,7),new THREE.MeshLambertMaterial({color:0x3e5a34}));
   sh.position.set(-58+i*8.5,0.9,7.5); sh.scale.y=0.85; T(sh,1997);
@@ -210,23 +202,31 @@ for(let i=0;i<4;i++){const post=new THREE.Mesh(new THREE.BoxGeometry(0.28,2.4,0.
 T(fence,1997);
 
 // steel headframe over the shaft (east of / right of the house — per RM)
+// GEOMETRY: the rope run is the axis. From the hoist house you face the frame's WIDE side;
+// the two sheaves sit side by side across that wide top, wheels EDGE-ON in the rope plane;
+// backlegs slope down toward the house, taking the resultant pull.
 const steel=new THREE.MeshLambertMaterial({color:0x6e4438});
 const shf=new THREE.Group();
-[[-2.6,-2.6],[2.6,-2.6],[-2.6,2.6],[2.6,2.6]].forEach(p=>{
- const leg=new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.5,26,7),steel);
- leg.position.set(p[0]*0.55,13,p[1]*0.55); shf.add(leg);});
-// backlegs toward the hoist house
-[[-1.2],[1.2]].forEach(p=>{
- const bk=new THREE.Mesh(new THREE.CylinderGeometry(0.28,0.4,29,7),steel);
- bk.position.set(-7,12.5,p[0]); bk.rotation.z=0.55; shf.add(bk);});
-// bracing
-for(let y=5;y<=21;y+=5){const br=new THREE.Mesh(new THREE.BoxGeometry(4.6,0.3,4.6),steel);
+function strut(x1,y1,z1,x2,y2,z2,r){
+ const dir=new THREE.Vector3(x2-x1,y2-y1,z2-z1);const len=dir.length();
+ const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,7),steel);
+ m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
+ m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());return m;}
+// four battered legs: WIDE across the rope axis (z), narrow along it (x)
+[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
+ shf.add(strut(p[0]*1.9,0,p[1]*3.0, p[0]*1.0,26,p[1]*2.2,0.32));});
+// backlegs toward the hoist house (rope side), feet planted back along the rope axis
+shf.add(strut(-13.5,0,-2.2, -0.6,25.2,-2.1,0.34));
+shf.add(strut(-13.5,0, 2.2, -0.6,25.2, 2.1,0.34));
+shf.add(strut(-8,10.5,-2.2, -8,10.5,2.2,0.18));
+// horizontal ring bracing — visibly wider than deep
+for(let y=6;y<=20;y+=7){const br=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.3,5.6),steel);
  br.position.y=y; shf.add(br);}
-const sdeck=new THREE.Mesh(new THREE.BoxGeometry(5,1.6,5),steel); sdeck.position.y=26; shf.add(sdeck);
-// sheave wheels
+const sdeck=new THREE.Mesh(new THREE.BoxGeometry(3.8,1.5,6.4),steel); sdeck.position.y=26.6; shf.add(sdeck);
+// sheave wheels: side by side across the wide top, wheel planes ALIGNED with the ropes
 [[-0.9],[0.9]].forEach(p=>{
  const sh=new THREE.Mesh(new THREE.TorusGeometry(1.5,0.22,8,18),new THREE.MeshLambertMaterial({color:0x3a3f45}));
- sh.position.set(0,27.6,p[0]); sh.rotation.y=Math.PI/2; shf.add(sh);});
+ sh.position.set(0,28,p[0]); shf.add(sh);});
 shf.position.set(30,0,0); T(shf,1951);
 const hfL=label('STEEL HEADFRAME — "B" SHAFT',4.5,'#ffb26b'); hfL.position.set(30,31,7); T(hfL,1951);
 // hoist ropes: out of the wall at the 2nd window from the left -> across the yard -> sheaves -> shaft (working era)
@@ -236,10 +236,10 @@ function rope(x1,y1,z1,x2,y2,z2,r){
   new THREE.MeshBasicMaterial({color:0xd8d0c0}));
  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); return m;}
-T(rope(-64.5,5.9,4.6, 30,27.6,-0.9),1951,1966);
-T(rope(-63.1,5.9,4.6, 30,27.6, 0.9),1951,1966);
-T(rope(30,27.6,-0.9,30,1,-0.9),1951,1966);
-T(rope(30,27.6, 0.9,30,1, 0.9),1951,1966);
+T(rope(-64.5,5.9,4.6, 28.6,28,-0.9),1951,1966);
+T(rope(-63.1,5.9,4.6, 28.6,28, 0.9),1951,1966);
+T(rope(30,28,-0.9,30,1,-0.9),1951,1966);
+T(rope(30,28, 0.9,30,1, 0.9),1951,1966);
 const ropeL=label('THE ROPES — out the wall by the 2nd window, across the yard to the sheaves',3.2,'#d8d0c0'); ropeL.position.set(-16,22,4); T(ropeL,1954,1966);
 const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(-16,20,4); T(endL,1966,1970);
 // the service line that still runs to that same corner of the building today (per photo)
