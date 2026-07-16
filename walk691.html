@@ -91,17 +91,17 @@ const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0x030404);
-scene.fog=new THREE.FogExp2(0x030404,0.019);
+scene.fog=new THREE.FogExp2(0x030404,0.015);
 
 const camera=new THREE.PerspectiveCamera(70,2,0.1,600);
 const EYE=1.7;                       // meters-ish; 1 unit = ~1 m here for walking feel
 camera.position.set(0,EYE,40);
 
 // cap lamp: spotlight bound to camera + weak point glow
-const lamp=new THREE.SpotLight(0xffe8c0,2.3,75,Math.PI/5,0.45,1.6);
+const lamp=new THREE.SpotLight(0xffe8c0,2.8,90,Math.PI/5,0.45,1.6);
 scene.add(lamp); scene.add(lamp.target);
-const glow=new THREE.PointLight(0xffd9a0,0.6,18); scene.add(glow);
-scene.add(new THREE.AmbientLight(0x2a3a44,0.75));
+const glow=new THREE.PointLight(0xffd9a0,0.85,22); scene.add(glow);
+scene.add(new THREE.AmbientLight(0x32434e,1.0));
 
 // ---------- rock material with canvas noise ----------
 function rockTexture(base,vary){
@@ -339,13 +339,7 @@ const sm3=new THREE.Mesh(new THREE.BoxGeometry(5.5,5,6.5),millMat); sm3.position
 [[0,12.3,9.5],[7.4,8.8,7],[12.8,5.3,6]].forEach(p=>{
   const rf=new THREE.Mesh(new THREE.BoxGeometry(p[2],0.5,8.4),new THREE.MeshLambertMaterial({color:0x453c33}));
   rf.position.set(p[0],p[1],0); smill.add(rf);});
-const sconv=new THREE.Mesh(new THREE.BoxGeometry(26,0.9,1.8),millMat);
-sconv.position.set(16,7,-3.4); sconv.rotation.z=-0.42; sconv.rotation.y=0.22; smill.add(sconv);
 smill.position.set(stationX-40,SURF,stationZ-6); scene.add(smill);
-[[stationX-10,stationZ-18,5.5,4.2],[stationX-20,stationZ-24,7,5.2]].forEach(p=>{
-  const sp2=new THREE.Mesh(new THREE.ConeGeometry(p[2],p[3],9),
-    new THREE.MeshLambertMaterial({map:oreT}));
-  sp2.position.set(p[0],SURF+p[3]/2,p[1]); scene.add(sp2);});
 // ---------- water towers east of the headframe ----------
 [[stationX-13,stationZ+3,2.0,16,true],[stationX-18,stationZ-4,1.4,6.5,false]].forEach(t=>{
   const grp=new THREE.Group();
@@ -359,15 +353,15 @@ smill.position.set(stationX-40,SURF,stationZ-6); scene.add(smill);
   grp.position.set(t[0],SURF,t[1]); scene.add(grp);
 });
 // surface obstacle collisions (mill, stockpiles, towers)
-const SOBS=[{x:stationX-32,z:stationZ-6,r:11},{x:stationX-10,z:stationZ-18,r:6.5},
-  {x:stationX-20,z:stationZ-24,r:8},{x:stationX-13,z:stationZ+3,r:2.4},{x:stationX-18,z:stationZ-4,r:1.8}];
+const SOBS=[{x:stationX-32,z:stationZ-6,r:11},
+  {x:stationX-13,z:stationZ+3,r:2.4},{x:stationX-18,z:stationZ-4,r:1.8}];
 dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
 function applyDepthAtmosphere(){
   const f=Math.max(0,Math.min(1,(SURF-camera.position.y)/(SURF-EYE)));
   const c=SKY.clone().lerp(CAVE, Math.min(1,f*1.6));
   scene.background.copy(c); scene.fog.color.copy(c);
-  scene.fog.density=0.004+ (0.019/Math.sqrt(lampScale)-0.004)*f;
+  scene.fog.density=0.004+ (0.015/Math.sqrt(lampScale)-0.004)*f;
   dayLight.intensity=1.4*(1-f);
 }
 let descending=false, descY=DESC_TOP;
@@ -386,7 +380,7 @@ function updateDepthHUD(){
 // ---------- lamp brightness control ----------
 document.getElementById('lamprange').oninput=e=>{
   lampScale=e.target.value/100;
-  scene.fog.density=0.019/Math.sqrt(lampScale);
+  scene.fog.density=0.015/Math.sqrt(lampScale);
 };
 
 // ---------- drift lights: a string of bulbs from the station into the workings ----------
@@ -396,7 +390,7 @@ for(let i=0;i<LPATH.length;i++){
   const bulb=new THREE.Mesh(new THREE.SphereGeometry(0.14,6,6),
     new THREE.MeshBasicMaterial({color:0xffe0a8}));
   bulb.position.set(lx,4.7,lz); scene.add(bulb);
-  if(i%2===0){ const pl=new THREE.PointLight(0xffd9a0,0.95,28);
+  if(i%2===0){ const pl=new THREE.PointLight(0xffd9a0,1.25,32);
     pl.position.set(lx,4.5,lz); scene.add(pl); }
   if(i>0){ const [px,pz]=LPATH[i-1];
     const wire=new THREE.Mesh(new THREE.CylinderGeometry(0.03,0.03,
@@ -634,8 +628,8 @@ function animate(t){
   lamp.target.position.copy(camera.position).add(dir.multiplyScalar(10));
   glow.position.copy(camera.position);
   // lamp flicker
-  lamp.intensity=(2.25+Math.sin(t*0.013)*0.08+Math.random()*0.04)*lampScale;
-  glow.intensity=0.6*lampScale;
+  lamp.intensity=(2.75+Math.sin(t*0.013)*0.08+Math.random()*0.04)*lampScale;
+  glow.intensity=0.85*lampScale;
   drawMap();
   renderer.render(scene,camera);
 }
