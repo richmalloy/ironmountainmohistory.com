@@ -286,24 +286,30 @@ sdeck.position.set(stationX,SURF+15.6,stationZ); scene.add(sdeck);
 // the brick hoist house across the yard, ropes flying to the sheaves
 const hhouse=new THREE.Group();
 const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
-// THE L — per RM: the long office wing runs east–west facing the yard; the HOIST ROOM is turned
-// 90° to the left at the west end, its long side (the drum axle) crosswise to the rope run.
-const hb2=new THREE.Mesh(new THREE.BoxGeometry(46,4.6,7.4),brickM); hb2.position.set(-29,2.3,0); hhouse.add(hb2);
-const hb1=new THREE.Mesh(new THREE.BoxGeometry(8,5.6,12),brickM);  hb1.position.set(-58,2.8,-1.5); hhouse.add(hb1);
+// PER THE 2020 AERIAL (Plate VII): long office wing east–west facing the yard; the HOIST ROOM is the
+// taller cross-gabled wing at the EAST (right) end, turned 90° — its east wall faces the headframe
+// across the yard, drum beds inside on the rope axis (RM interior observation, Apr 2026).
+const hb2=new THREE.Mesh(new THREE.BoxGeometry(42,4.6,7.4),brickM); hb2.position.set(-31,2.3,0); hhouse.add(hb2);
+const hb1=new THREE.Mesh(new THREE.BoxGeometry(8,5.6,12),brickM);  hb1.position.set(-6,2.8,-1); hhouse.add(hb1);
 const roofM=new THREE.MeshLambertMaterial({color:0x6e3a34});   // the red metal roof
-const hr2=new THREE.Mesh(new THREE.BoxGeometry(47,0.7,8.4),roofM);
-hr2.position.set(-29,5.3,0); hhouse.add(hr2);
+const hr2=new THREE.Mesh(new THREE.BoxGeometry(43,0.7,8.4),roofM);
+hr2.position.set(-31,5.3,0); hhouse.add(hr2);
 const hr1=new THREE.Mesh(new THREE.BoxGeometry(9,0.7,13),roofM);
-hr1.position.set(-58,6.1,-1.5); hhouse.add(hr1);
-// window row along the yard face — the rope portal sits at the 2nd opening from the left
-for(let i=0;i<9;i++){
+hr1.position.set(-6,6.1,-1); hhouse.add(hr1);
+// window row along the yard face of the office wing
+for(let i=0;i<8;i++){
   const w=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,0.15),
     new THREE.MeshLambertMaterial({color:0x2a3138}));
   w.position.set(-50+i*5.2,2.6,3.75); hhouse.add(w);
 }
-const hport=new THREE.Mesh(new THREE.BoxGeometry(2.2,2.2,0.2),
+// east wall of the hoist room: window row with the rope port at the 2nd opening from the left
+const ew1=new THREE.Mesh(new THREE.BoxGeometry(0.15,1.6,1.6),new THREE.MeshLambertMaterial({color:0x2a3138}));
+ew1.position.set(-1.95,2.6,2.8); hhouse.add(ew1);
+const ew2=new THREE.Mesh(new THREE.BoxGeometry(0.15,1.6,1.6),new THREE.MeshLambertMaterial({color:0x2a3138}));
+ew2.position.set(-1.95,2.6,-4.4); hhouse.add(ew2);
+const hport=new THREE.Mesh(new THREE.BoxGeometry(0.2,2.4,3.0),
   new THREE.MeshLambertMaterial({color:0x0e1114}));
-hport.position.set(-57,4.0,4.62); hhouse.add(hport);
+hport.position.set(-1.92,4.0,-0.2); hhouse.add(hport);
 hhouse.position.set(stationX-24,SURF,stationZ); scene.add(hhouse);
 function srope(x1,y1,z1,x2,y2,z2){
   const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
@@ -311,8 +317,8 @@ function srope(x1,y1,z1,x2,y2,z2){
     new THREE.MeshBasicMaterial({color:0xd8d0c0}));
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-srope(stationX-81.6,SURF+4.2,stationZ+4.75, stationX,SURF+16.6,stationZ-0.8);
-srope(stationX-80.4,SURF+4.2,stationZ+4.75, stationX,SURF+16.6,stationZ+0.8);
+srope(stationX-25.9,SURF+4.2,stationZ-0.8, stationX,SURF+16.6,stationZ-0.8);
+srope(stationX-25.9,SURF+4.2,stationZ+0.8, stationX,SURF+16.6,stationZ+0.8);
 // and down the shaft — you ride under these
 srope(stationX,SURF+16.6,stationZ-0.8, stationX,EYE+4.2,stationZ-0.8);
 srope(stationX,SURF+16.6,stationZ+0.8, stationX,EYE+4.2,stationZ+0.8);
@@ -425,10 +431,10 @@ function startTour(){
   camera.position.set(stationX-46,SURF+EYE,stationZ+30);
   yaw=lookYawPitch(camera.position,[stationX-50,SURF+3,stationZ+2])[0]; pitch=0;
   tour={i:0,phase:'walk',t0:performance.now(),segs:[
-    {a:[stationX-46,SURF+EYE,stationZ+30], b:[stationX-22,SURF+EYE,stationZ+14], look:[stationX-50,SURF+3,stationZ+2], d:6.5,
-     t:'Morning shift, 1958. Clock in at the long building — the hoist room is the tall wing at its left end.'},
+    {a:[stationX-46,SURF+EYE,stationZ+30], b:[stationX-22,SURF+EYE,stationZ+14], look:[stationX-33,SURF+3,stationZ+2], d:6.5,
+     t:'Morning shift, 1958. The long office ahead — the hoist room is the tall cross-wing at its right end, facing the shaft.'},
     {a:[stationX-22,SURF+EYE,stationZ+14], b:[stationX-4,SURF+EYE,stationZ+9], look:[stationX,SURF+16,stationZ], d:5.5,
-     t:'The ropes leave the hoist room by the second window and climb to the sheaves — singing already.'},
+     t:'The ropes leave the hoist room\u2019s east wall and cross the yard to the sheaves — singing already.'},
     {a:[stationX-4,SURF+EYE,stationZ+9], b:[stationX,SURF+EYE,stationZ+0.4], look:[stationX,SURF-3,stationZ], d:4.5,
      t:'Step on. Hold the bar. Two bells — man riding.'}
   ]};
@@ -447,8 +453,8 @@ document.getElementById('go').onclick=startTour;
 document.getElementById('free').onclick=()=>{
   startEl.style.display='none';
   atSurface=true;
-  camera.position.set(stationX-20,SURF+EYE,stationZ+34);  // in the yard, the photo's vantage
-  yaw=0.55; pitch=0.02;                                   // the long facade ahead, headframe to the right
+  camera.position.set(stationX-42,SURF+EYE,stationZ+34);  // in the yard, the photo's vantage
+  yaw=0.35; pitch=0.02;                                   // the long facade ahead, headframe to the right
   document.getElementById('hint').style.display='block';
 };
 document.getElementById('lower').onclick=()=>{
@@ -582,16 +588,16 @@ function animate(t){
     if(atSurface){
       move(dt,true);
       let nx=camera.position.x, nz=camera.position.z;
-      // the L is solid: office wing east-west, hoist room turned at the west end
-      if(nx>stationX-76.5&&nx<stationX-29.5&&nz>stationZ-4.2&&nz<stationZ+4.2){
+      // the T is solid: office wing east-west, hoist room cross-wing at the east end
+      if(nx>stationX-76.5&&nx<stationX-33.5&&nz>stationZ-4.2&&nz<stationZ+4.2){
         nz = (nz<stationZ)? stationZ-4.2 : stationZ+4.2;
       }
-      if(nx>stationX-86.6&&nx<stationX-77.4&&nz>stationZ-8.1&&nz<stationZ+5.1){
-        const dw=nx-(stationX-86.6), de=(stationX-77.4)-nx,
-              ds=(stationZ+5.1)-nz, dn=nz-(stationZ-8.1);
+      if(nx>stationX-34.5&&nx<stationX-25.5&&nz>stationZ-7.5&&nz<stationZ+5.5){
+        const dw=nx-(stationX-34.5), de=(stationX-25.5)-nx,
+              ds=(stationZ+5.5)-nz, dn=nz-(stationZ-7.5);
         const m=Math.min(dw,de,ds,dn);
-        if(m===dw)nx=stationX-86.6; else if(m===de)nx=stationX-77.4;
-        else if(m===ds)nz=stationZ+5.1; else nz=stationZ-8.1;
+        if(m===dw)nx=stationX-34.5; else if(m===de)nx=stationX-25.5;
+        else if(m===ds)nz=stationZ+5.5; else nz=stationZ-7.5;
       }
       // mill, stockpiles, water towers are solid too
       for(const o of SOBS){
