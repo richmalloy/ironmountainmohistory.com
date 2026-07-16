@@ -153,13 +153,13 @@ const ropeL=label('ROPES RUNNING — ore below',3.6,'#d8d0c0'); ropeL.position.s
 const endL=label('1966 — the ropes stop',4,'#8b949c'); endL.position.set(-4,22,-6); T(endL,1966,1970);
 
 // water towers east of headframe (extant)
-[[14,2.8,2.4],[20,-3,1.7]].forEach(t=>{
+[[14,2.8,2.6,19],[20,-3,1.8,13]].forEach(t=>{   // [x,z,radius,height] — big tank notably TALL (per hero photo)
  const grp=new THREE.Group();
- const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],3.4,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
- tank.position.y=13; grp.add(tank);
+ const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],4,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
+ tank.position.y=t[3]; grp.add(tank);
  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
-  const lg=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.2,12,5),steel);
-  lg.position.set(p[0]*t[2]*0.5,6,p[1]*t[2]*0.5); grp.add(lg);});
+  const lg=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.22,t[3]-2,5),steel);
+  lg.position.set(p[0]*t[2]*0.5,(t[3]-2)/2,p[1]*t[2]*0.5); grp.add(lg);});
  grp.position.set(t[0],0,t[1]); T(grp,1951);
 });
 const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(17,19,0); T(wtL,1951);
@@ -180,11 +180,26 @@ fill.position.set(-50,0.8,-6); T(fill,1968);
 const thL=label('THICKENER — mine-water clarifier',3.8,'#c9c2ae'); thL.position.set(-50,5,0); T(thL,1951,1967);
 const thL2=label('THICKENER — rock-filled at closure',3.8,'#9a998c'); thL2.position.set(-50,5,0); T(thL2,1968);
 
-// the MILL south of the house — burns 1978
-const mill=new THREE.Mesh(new THREE.BoxGeometry(15,10,10),new THREE.MeshLambertMaterial({color:0x7a6a55}));
-mill.position.set(-2,5,-26); T(mill,1944,1978);
-const millL=label('THE MILL',4.2,'#c9c2ae'); millL.position.set(-2,12,-26); T(millL,1944,1978);
-const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(-2,10,-22); T(f78,1978,1982);
+// the MILL — tiered gravity mill ADJACENT to the headframe (per the Ozark Ore hero photo); burns 1978
+const millMat=new THREE.MeshLambertMaterial({color:0x7a6a55});
+const mill=new THREE.Group();
+const m1=new THREE.Mesh(new THREE.BoxGeometry(10,14,9),millMat); m1.position.set(0,7,0); mill.add(m1);      // headhouse tier
+const m2=new THREE.Mesh(new THREE.BoxGeometry(9,10,9),millMat);  m2.position.set(8.5,5,0); mill.add(m2);   // mid tier
+const m3=new THREE.Mesh(new THREE.BoxGeometry(9,6.5,9),millMat); m3.position.set(16.5,3.25,0); mill.add(m3);// lower tier
+const m4=new THREE.Mesh(new THREE.BoxGeometry(8,4,8),millMat);   m4.position.set(24,2,0); mill.add(m4);    // loadout
+[ [0,14.4],[8.5,10.4],[16.5,6.9],[24,4.4] ].forEach(p=>{
+  const rf=new THREE.Mesh(new THREE.BoxGeometry(10.5,0.6,9.5),new THREE.MeshLambertMaterial({color:0x4f463c}));
+  rf.position.set(p[0],p[1],0); mill.add(rf);});
+mill.position.set(6,0,-13); T(mill,1944,1978);
+const millL=label('THE MILL — ore fed from the headframe, stepping down by gravity',3.9,'#c9c2ae'); millL.position.set(16,17,-13); T(millL,1944,1978);
+const f78=label('★ 1978 — THE MILL BURNS · the headframe survives',4.6,'#ff6a3a'); f78.position.set(14,12,-10); T(f78,1978,1982);
+// rail BEHIND the mill (per RM) with ore cars, loading out concentrates
+const millRail=new THREE.Mesh(new THREE.BoxGeometry(120,0.15,1.4),new THREE.MeshLambertMaterial({color:0x6b6258}));
+millRail.position.set(14,0.1,-22); T(millRail,1944);
+for(let i=0;i<3;i++){
+  const ocar=new THREE.Mesh(new THREE.BoxGeometry(4,1.6,2),new THREE.MeshLambertMaterial({color:0x54443a}));
+  ocar.position.set(18+i*5.5,0.9,-22); T(ocar,1944,1978);
+}
 
 // quarry-era touch
 const doNotL=label('WORKING QUARRY OFFICE — today',4,'#b8ab90'); doNotL.position.set(-26,14,9); T(doNotL,1997);
