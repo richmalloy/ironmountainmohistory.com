@@ -270,20 +270,27 @@ function sstrut(x1,y1,z1,x2,y2,z2,r){
   const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,L,6),steelM);
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-// battered legs: wide across the rope axis (x), narrow along it (z) — the ropes arrive from the building
+// the rope axis: from the shaft toward the port on the yard face (oblique, per RM aerial)
+const SRU={x:0.8046,z:-0.5938}, SRV={x:0.5938,z:0.8046};
+function SRP(a,b){return [stationX+SRU.x*a+SRV.x*b, stationZ+SRU.z*a+SRV.z*b];}
+// battered legs: wide across the rope axis, narrow along it
 [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
-  sstrut(stationX+p[0]*2.0,SURF,stationZ+p[1]*1.25, stationX+p[0]*1.4,SURF+15,stationZ+p[1]*0.7,0.17);});
+  const f=SRP(p[0]*1.25,p[1]*2.0), t=SRP(p[0]*0.7,p[1]*1.4);
+  sstrut(f[0],SURF,f[1], t[0],SURF+15,t[1],0.17);});
 // backlegs leaning home toward the hoist house, feet on the rope axis
-sstrut(stationX-1.3,SURF,stationZ-8.5, stationX-1.2,SURF+14.6,stationZ-0.4,0.18);
-sstrut(stationX+1.3,SURF,stationZ-8.5, stationX+1.2,SURF+14.6,stationZ-0.4,0.18);
+[[-1],[1]].forEach(p=>{
+  const f=SRP(8.5,p[0]*1.3), t=SRP(0.4,p[0]*1.2);
+  sstrut(f[0],SURF,f[1], t[0],SURF+14.6,t[1],0.18);});
 const sdeck=new THREE.Mesh(new THREE.BoxGeometry(4.4,1.0,2.4),steelM);
+sdeck.rotation.y=Math.atan2(-SRV.z,SRV.x);
 sdeck.position.set(stationX,SURF+15.6,stationZ); scene.add(sdeck);
 // sheave wheels, side by side across the wide top, wheel planes aligned with the ropes
 [[-0.8],[0.8]].forEach(p=>{
   const sw=new THREE.Mesh(new THREE.TorusGeometry(0.95,0.14,7,16),
     new THREE.MeshLambertMaterial({color:0x3a3f45}));
-  sw.rotation.y=Math.PI/2;
-  sw.position.set(stationX+p[0],SURF+16.6,stationZ); scene.add(sw);});
+  sw.rotation.y=Math.atan2(-SRU.z,SRU.x);
+  const sp2=SRP(0,p[0]);
+  sw.position.set(sp2[0],SURF+16.6,sp2[1]); scene.add(sw);});
 // the brick hoist house across the yard, ropes flying to the sheaves
 const hhouse=new THREE.Group();
 const brickM=new THREE.MeshLambertMaterial({color:0x8a5040});
@@ -295,14 +302,14 @@ const roofM=new THREE.MeshLambertMaterial({color:0x6e3a34});   // the red metal 
 const hr=new THREE.Mesh(new THREE.BoxGeometry(67.5,0.7,9),roofM); hr.position.set(21,5.9,0); hhouse.add(hr);
 // window row along the yard face — the ROPE PORT is the 2nd opening from the left
 for(let i=0;i<11;i++){
-  if(i===1) continue;
+  if(i===9) continue;
   const w=new THREE.Mesh(new THREE.BoxGeometry(1.6,1.6,0.15),
     new THREE.MeshLambertMaterial({color:0x2a3138}));
   w.position.set(-9+i*5.2,2.6,4.05); hhouse.add(w);
 }
 const hport=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.4,0.2),
   new THREE.MeshLambertMaterial({color:0x0e1114}));
-hport.position.set(-3.8,3.7,4.1); hhouse.add(hport);
+hport.position.set(37.8,3.7,4.1); hhouse.add(hport);
 hhouse.position.set(stationX,SURF,stationZ-32); scene.add(hhouse);
 function srope(x1,y1,z1,x2,y2,z2){
   const d=new THREE.Vector3(x2-x1,y2-y1,z2-z1); const L=d.length();
@@ -310,11 +317,12 @@ function srope(x1,y1,z1,x2,y2,z2){
     new THREE.MeshBasicMaterial({color:0xd8d0c0}));
   m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
   m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize()); scene.add(m);}
-srope(stationX-4.4,SURF+4.0,stationZ-27.9, stationX-0.8,SURF+16.6,stationZ);
-srope(stationX-3.2,SURF+4.0,stationZ-27.9, stationX+0.8,SURF+16.6,stationZ);
+{const p1=SRP(0,-0.8), p2=SRP(0,0.8);
+srope(stationX+37.8+SRV.x*0.6,SURF+4.0,stationZ-27.9+SRV.z*0.6, p1[0],SURF+16.6,p1[1]);
+srope(stationX+37.8-SRV.x*0.6,SURF+4.0,stationZ-27.9-SRV.z*0.6, p2[0],SURF+16.6,p2[1]);
 // and down the shaft — you ride under these
-srope(stationX-0.8,SURF+16.6,stationZ, stationX-0.8,EYE+4.2,stationZ);
-srope(stationX+0.8,SURF+16.6,stationZ, stationX+0.8,EYE+4.2,stationZ);
+srope(p1[0],SURF+16.6,p1[1], p1[0],EYE+4.2,p1[1]);
+srope(p2[0],SURF+16.6,p2[1], p2[0],EYE+4.2,p2[1]);}
 const hhL=(()=>{const c=document.createElement('canvas');c.width=1024;c.height=200;
  const g=c.getContext('2d');g.font='600 40px monospace';g.fillStyle='#efe6d0';
  g.textBaseline='middle';g.shadowColor='#000';g.shadowBlur=8;
@@ -333,13 +341,13 @@ const sm3=new THREE.Mesh(new THREE.BoxGeometry(5.5,5,6.5),millMat); sm3.position
   rf.position.set(p[0],p[1],0); smill.add(rf);});
 const sconv=new THREE.Mesh(new THREE.BoxGeometry(26,0.9,1.8),millMat);
 sconv.position.set(16,7,-3.4); sconv.rotation.z=-0.42; sconv.rotation.y=0.22; smill.add(sconv);
-smill.position.set(stationX+26,SURF,stationZ-6); scene.add(smill);
-[[stationX+50,stationZ-14,7,4.5],[stationX+60,stationZ-20,9,5.5]].forEach(p=>{
+smill.position.set(stationX-40,SURF,stationZ-6); scene.add(smill);
+[[stationX-10,stationZ-18,5.5,4.2],[stationX-20,stationZ-24,7,5.2]].forEach(p=>{
   const sp2=new THREE.Mesh(new THREE.ConeGeometry(p[2],p[3],9),
     new THREE.MeshLambertMaterial({map:oreT}));
   sp2.position.set(p[0],SURF+p[3]/2,p[1]); scene.add(sp2);});
 // ---------- water towers east of the headframe ----------
-[[stationX+13,stationZ+3,2.0,16,true],[stationX+18,stationZ-4,1.4,6.5,false]].forEach(t=>{
+[[stationX-13,stationZ+3,2.0,16,true],[stationX-18,stationZ-4,1.4,6.5,false]].forEach(t=>{
   const grp=new THREE.Group();
   const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],3,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
   tank.position.y=t[3]; grp.add(tank);
@@ -351,8 +359,8 @@ smill.position.set(stationX+26,SURF,stationZ-6); scene.add(smill);
   grp.position.set(t[0],SURF,t[1]); scene.add(grp);
 });
 // surface obstacle collisions (mill, stockpiles, towers)
-const SOBS=[{x:stationX+33,z:stationZ-6,r:11},{x:stationX+50,z:stationZ-14,r:8},
-  {x:stationX+60,z:stationZ-20,r:9.5},{x:stationX+13,z:stationZ+3,r:2.4},{x:stationX+18,z:stationZ-4,r:1.8}];
+const SOBS=[{x:stationX-32,z:stationZ-6,r:11},{x:stationX-10,z:stationZ-18,r:6.5},
+  {x:stationX-20,z:stationZ-24,r:8},{x:stationX-13,z:stationZ+3,r:2.4},{x:stationX-18,z:stationZ-4,r:1.8}];
 dayLight.position.set(stationX,SURF+3,stationZ); scene.add(dayLight);
 const SKY=new THREE.Color(0x9fc3de), CAVE=new THREE.Color(0x030404);
 function applyDepthAtmosphere(){
@@ -446,8 +454,8 @@ document.getElementById('go').onclick=startTour;
 document.getElementById('free').onclick=()=>{
   startEl.style.display='none';
   atSurface=true;
-  camera.position.set(stationX-30,SURF+EYE,stationZ-12);  // in the yard, the photo's vantage
-  yaw=-1.25; pitch=0.02;                                   // the long building ahead, headframe to the right                                   // the long facade ahead, headframe to the right
+  camera.position.set(stationX+16,SURF+EYE,stationZ-10);  // in the yard, the photo's vantage
+  yaw=0.9; pitch=0.02;                                     // the long building ahead, headframe to the left                                   // the long facade ahead, headframe to the right
   document.getElementById('hint').style.display='block';
 };
 document.getElementById('lower').onclick=()=>{
@@ -566,10 +574,17 @@ function animate(t){
     } else if(tour.phase==='descend'){
       pitch+=(0-pitch)*Math.min(1,dt*0.9);
       let dy0=-yaw; dy0=Math.atan2(Math.sin(dy0),Math.cos(dy0)); yaw+=dy0*Math.min(1,dt*0.9);
-      if(!descending){ tour.phase='arrive'; tour.t0=t;
-        tourcap.textContent='The 691. Cap lamp on — the workings are ahead. Walk.'; }
+      if(!descending){ tour.phase='exit'; tour.t0=t;
+        tourcap.textContent='The 691. Cap lamp on — step off the cage.'; }
+    } else if(tour.phase==='exit'){
+      const pe=Math.min(1,(t-tour.t0)/3200), sme=pe*pe*(3-2*pe);
+      camera.position.set(stationX, EYE+Math.sin(t*0.009)*0.06, stationZ-sme*8);
+      pitch+=(0-pitch)*Math.min(1,dt*2);
+      let dy1=-yaw; dy1=Math.atan2(Math.sin(dy1),Math.cos(dy1)); yaw+=dy1*Math.min(1,dt*2);
+      if(pe>=1){ tour.phase='arrive'; tour.t0=t;
+        tourcap.textContent="It's yours now. Walk with ↑ or W (hold WALK on mobile) — drag to look, ← → to turn."; }
     } else if(tour.phase==='arrive'){
-      if(t-tour.t0>4200) endTour();
+      if(t-tour.t0>5600) endTour();
     }
   }
   if(descending){

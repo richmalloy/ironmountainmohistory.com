@@ -162,7 +162,7 @@ const mainB=new THREE.Mesh(new THREE.BoxGeometry(66,7,9),brick); mainB.position.
 const winM=new THREE.MeshLambertMaterial({color:0xcfd8dd,emissive:0x18262e});
 for(let i=0;i<11;i++){
   const x=-65+i*5.2;
-  if(i===1) continue;                 // 2nd window from the left = the rope port
+  if(i===9) continue;                 // 2nd window from the other end = the rope port
   if(Math.abs(x+41)<6.5) continue;    // glass-block band lives here
   const w=new THREE.Mesh(new THREE.BoxGeometry(1.7,2.1,0.26),winM);
   w.position.set(x,3.9,4.55); bldg.add(w);
@@ -170,9 +170,9 @@ for(let i=0;i<11;i++){
 // ROPE PORT — the 2nd window from the left on the yard face, straight off the twin drum beds
 // inside the hoist room end (RM interior observation, Apr 2026)
 const portal=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.8,0.3),new THREE.MeshLambertMaterial({color:0x14181c}));
-portal.position.set(-59.8,5.0,4.6); bldg.add(portal);
+portal.position.set(-18.2,5.0,4.6); bldg.add(portal);
 const hood=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.5,1.6),new THREE.MeshLambertMaterial({color:0x3a3f45}));
-hood.position.set(-59.8,6.8,5.1); bldg.add(hood);
+hood.position.set(-18.2,6.8,5.1); bldg.add(hood);
 // glass block band (the Christmas window wall)
 const glass=new THREE.Mesh(new THREE.BoxGeometry(12,2.2,0.3),
  new THREE.MeshLambertMaterial({color:0xbfd8e8,emissive:0x224455}));
@@ -201,25 +201,31 @@ for(let i=0;i<4;i++){const post=new THREE.Mesh(new THREE.BoxGeometry(0.28,2.4,0.
 T(fence,1997);
 
 // steel headframe over the shaft — ACROSS THE YARD from the building (per RM aerial),
-// wide face and backlegs toward the house, sheaves edge-on in the rope plane.
+// wide face and backlegs toward the house, sheaves edge-on in the (oblique) rope plane.
 const steel=new THREE.MeshLambertMaterial({color:0x6e4438});
 const shf=new THREE.Group();
+const PRU={x:0.842,z:-0.540}, PRV={x:0.540,z:0.842};
+const PRP=(a,b)=>[PRU.x*a+PRV.x*b, PRU.z*a+PRV.z*b];
 function strut(x1,y1,z1,x2,y2,z2,r){
  const dir=new THREE.Vector3(x2-x1,y2-y1,z2-z1);const len=dir.length();
  const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,len,7),steel);
  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize());return m;}
 [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(p=>{
- shf.add(strut(p[0]*3.0,0,p[1]*1.9, p[0]*2.2,26,p[1]*1.0,0.32));});
-shf.add(strut(-2.2,0,-13.5, -2.1,25.2,-0.6,0.34));
-shf.add(strut( 2.2,0,-13.5,  2.1,25.2,-0.6,0.34));
-shf.add(strut(-2.2,10.5,-8, 2.2,10.5,-8,0.18));
+ const f=PRP(p[0]*1.9,p[1]*3.0), t=PRP(p[0]*1.0,p[1]*2.2);
+ shf.add(strut(f[0],0,f[1], t[0],26,t[1],0.32));});
+[[-1],[1]].forEach(p=>{
+ const f=PRP(13.5,p[0]*2.2), t=PRP(0.6,p[0]*2.1);
+ shf.add(strut(f[0],0,f[1], t[0],25.2,t[1],0.34));});
+{const b1=PRP(8,-2.2), b2=PRP(8,2.2); shf.add(strut(b1[0],10.5,b1[1], b2[0],10.5,b2[1],0.18));}
 for(let y=6;y<=20;y+=7){const br=new THREE.Mesh(new THREE.BoxGeometry(5.6,0.3,3.2),steel);
- br.position.y=y; shf.add(br);}
-const sdeck=new THREE.Mesh(new THREE.BoxGeometry(6.4,1.5,3.8),steel); sdeck.position.y=26.6; shf.add(sdeck);
+ br.rotation.y=Math.atan2(-PRV.z,PRV.x); br.position.y=y; shf.add(br);}
+const sdeck=new THREE.Mesh(new THREE.BoxGeometry(6.4,1.5,3.8),steel);
+sdeck.rotation.y=Math.atan2(-PRV.z,PRV.x); sdeck.position.y=26.6; shf.add(sdeck);
 [[-0.9],[0.9]].forEach(p=>{
  const sh=new THREE.Mesh(new THREE.TorusGeometry(1.5,0.22,8,18),new THREE.MeshLambertMaterial({color:0x3a3f45}));
- sh.rotation.y=Math.PI/2; sh.position.set(p[0],28,0); shf.add(sh);});
+ sh.rotation.y=Math.atan2(-PRU.z,PRU.x);
+ const sp2=PRP(0,p[0]); sh.position.set(sp2[0],28,sp2[1]); shf.add(sh);});
 shf.position.set(-64,0,34); T(shf,1951);
 const hfL=label('STEEL HEADFRAME — "B" SHAFT',4.5,'#ffb26b'); hfL.position.set(-64,31,41); T(hfL,1951);
 // hoist ropes: out of the wall at the 2nd window from the left -> across the yard -> sheaves -> shaft (working era)
@@ -229,12 +235,12 @@ function rope(x1,y1,z1,x2,y2,z2,r){
   new THREE.MeshBasicMaterial({color:0xd8d0c0}));
  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); return m;}
-T(rope(-60.4,5.4,4.65, -64.9,28,33.4),1951,1966);
-T(rope(-59.2,5.4,4.65, -63.1,28,33.4),1951,1966);
-T(rope(-64.9,28,34,-64.9,1,34),1951,1966);
-T(rope(-63.1,28,34,-63.1,1,34),1951,1966);
-const ropeL=label('THE ROPES — out of the hoist room, across the yard to the sheaves',3.2,'#d8d0c0'); ropeL.position.set(-58,22,20); T(ropeL,1954,1966);
-const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(-58,20,20); T(endL,1966,1970);
+T(rope(-18.8,5.4,4.65, -64.49,28,33.24),1951,1966);
+T(rope(-17.6,5.4,4.65, -63.51,28,34.76),1951,1966);
+T(rope(-64.49,28,33.24,-64.49,1,33.24),1951,1966);
+T(rope(-63.51,28,34.76,-63.51,1,34.76),1951,1966);
+const ropeL=label('THE ROPES — out of the hoist room, across the yard to the sheaves',3.2,'#d8d0c0'); ropeL.position.set(-41,22,22); T(ropeL,1954,1966);
+const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(-41,20,22); T(endL,1966,1970);
 // the service line that still runs to that same corner of the building today (per photo)
 const svc=rope(6,12.5,26, -58,6.8,4.7, 0.035); svc.material=new THREE.MeshBasicMaterial({color:0x222426});
 T(svc,1951);
@@ -242,7 +248,7 @@ const svcPole=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.22,13,6),new THRE
 svcPole.position.set(6,6.5,26); T(svcPole,1951);
 
 // water towers east of headframe (extant)
-[[-52,36,2.8,24,true],[-46,30,1.9,9,false]].forEach(t=>{ // big tower rivals the headframe; small tank squat
+[[-78,40,2.8,24,true],[-76,28,1.9,9,false]].forEach(t=>{ // big tower rivals the headframe; small tank squat
  const grp=new THREE.Group();
  const tank=new THREE.Mesh(new THREE.CylinderGeometry(t[2],t[2],4.2,10),new THREE.MeshLambertMaterial({color:0x7a5240}));
  tank.position.y=t[3]; grp.add(tank);
@@ -253,7 +259,7 @@ svcPole.position.set(6,6.5,26); T(svcPole,1951);
   lg.position.set(p[0]*t[2]*0.55,(t[3]-2)/2,p[1]*t[2]*0.55); grp.add(lg);});
  grp.position.set(t[0],0,t[1]); T(grp,1951);
 });
-const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(-49,19,34); T(wtL,1951);
+const wtL=label('WATER TANKS — fire & service',4,'#c9a284'); wtL.position.set(-81,19,34); T(wtL,1951);
 
 // THICKENER behind (west of) the long building — octagonal ring; fills with rock ~1968
 const oct=new THREE.Mesh(new THREE.TorusGeometry(4.2,0.6,6,8),
@@ -338,7 +344,7 @@ function startWalk(){
   slider.value=1958; setYear(1958);
   walk={i:0,t0:performance.now(),segs:[
    {a:[-8,1.9,92], b:[-26,1.9,60], la:[-38,5,2], lb:[-38,5,2], d:7.0, t:'The plant road, 1958. One long building ahead — office, post office, and the hoist room at its west end, under one roof.'},
-   {a:[-26,1.9,60], b:[-42,1.9,44], la:[-38,5,2], lb:[-59.8,6,4], d:7.0, t:'There — the ropes leave the wall by the second window from the left and cross the yard to the sheaves.'},
+   {a:[-26,1.9,60], b:[-42,1.9,44], la:[-38,5,2], lb:[-18.2,6,4], d:7.0, t:'There — the ropes leave the wall by the second window and cross the yard to the sheaves.'},
    {a:[-42,1.9,44], b:[-56,1.9,38], la:[-59.8,6,4], lb:[-64,26,34], d:6.0, t:'The steel headframe over "B" Shaft — wide face home to the house, sheaves turning.'},
    {a:[-56,1.9,38], b:[-62,1.9,35], la:[-64,26,34], lb:[-64,1.5,34], d:5.0, t:'The collar. Under your boots: 691 feet of cage guides and dark.'},
    {a:[-62,1.9,35], b:[60,34,84], la:[-64,1.5,34], lb:[-2,6,0], d:5.0, t:'— now take the years.', fly:true}
