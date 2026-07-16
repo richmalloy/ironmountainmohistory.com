@@ -153,40 +153,45 @@ collar.position.set(30,0.4,0); T(collar,1923,1951);
 const colL=label('BARE COLLAR — the idle years',4,'#8b949c'); colL.position.set(30,4,8); T(colL,1930,1944);
 
 // ===== ERA 2: the brick plant, ~1951–present =====
-// THE LONG BUILDING — per RM photo: ~200 ft continuous under one ridge, window row facing the yard (+z),
-// drum bay at the WEST (left) end where the ropes pass through the wall at the 2nd window from the left.
+// THE T — per the 2020 aerial (Plate VII): long office wing east–west facing the yard; the HOIST ROOM
+// is the taller cross-gabled wing at the EAST end, turned 90°, its east wall facing the headframe.
 const brick=new THREE.MeshLambertMaterial({color:0x8a5040});
 const bldg=new THREE.Group();
-const mainB=new THREE.Mesh(new THREE.BoxGeometry(68,7,9),brick); mainB.position.set(-38,3.5,0); bldg.add(mainB);
-// slightly taller drum bay, west end (the ropes' end)
-const drumBay=new THREE.Mesh(new THREE.BoxGeometry(16,8.6,9),brick); drumBay.position.set(-64,4.3,0); bldg.add(drumBay);
+const mainB=new THREE.Mesh(new THREE.BoxGeometry(58,7,9),brick); mainB.position.set(-41,3.5,0); bldg.add(mainB);
+const hoistRm=new THREE.Mesh(new THREE.BoxGeometry(10,8.6,15),brick); hoistRm.position.set(-7,4.3,-1); bldg.add(hoistRm);
 // window row along the yard face (from the photo: long even rhythm of openings)
 const winM=new THREE.MeshLambertMaterial({color:0xcfd8dd,emissive:0x18262e});
-for(let i=0;i<13;i++){
-  const x=-69+i*5.2;
-  if(i===1) continue;                 // 2nd window from the left = the rope portal
-  if(Math.abs(x+30)<6.5) continue;    // glass-block band lives here
+for(let i=0;i<10;i++){
+  const x=-66+i*5.2;
+  if(Math.abs(x+41)<6.5) continue;    // glass-block band lives here
   const w=new THREE.Mesh(new THREE.BoxGeometry(1.7,2.1,0.26),winM);
   w.position.set(x,3.9,4.55); bldg.add(w);
 }
-// the rope portal — 2nd window from the left, up on the drum-bay wall
-const portal=new THREE.Mesh(new THREE.BoxGeometry(2.6,2.8,0.32),new THREE.MeshLambertMaterial({color:0x14181c}));
-portal.position.set(-63.8,5.9,4.55); bldg.add(portal);
-const hood=new THREE.Mesh(new THREE.BoxGeometry(3.2,0.5,1.6),new THREE.MeshLambertMaterial({color:0x3a3f45}));
-hood.position.set(-63.8,7.5,5.1); bldg.add(hood);
+// east wall of the hoist room: windows flanking the ROPE PORT — 2nd opening from the left,
+// straight off the drum beds (RM interior observation: twin pits, rope run exits east)
+const ew1=new THREE.Mesh(new THREE.BoxGeometry(0.26,2.1,1.7),winM); ew1.position.set(-1.9,3.9,3.6); bldg.add(ew1);
+const ew2=new THREE.Mesh(new THREE.BoxGeometry(0.26,2.1,1.7),winM); ew2.position.set(-1.9,3.9,-5.6); bldg.add(ew2);
+const portal=new THREE.Mesh(new THREE.BoxGeometry(0.3,3.0,3.6),new THREE.MeshLambertMaterial({color:0x14181c}));
+portal.position.set(-1.88,5.9,-0.6); bldg.add(portal);
+const hood=new THREE.Mesh(new THREE.BoxGeometry(1.6,0.5,4.2),new THREE.MeshLambertMaterial({color:0x3a3f45}));
+hood.position.set(-1.5,7.7,-0.6); bldg.add(hood);
 // glass block band (the Christmas window wall)
 const glass=new THREE.Mesh(new THREE.BoxGeometry(12,2.2,0.3),
  new THREE.MeshLambertMaterial({color:0xbfd8e8,emissive:0x224455}));
-glass.position.set(-30,4.3,4.55); bldg.add(glass);
+glass.position.set(-41,4.3,4.55); bldg.add(glass);
 // gable roofs: gray era, then red metal (photo/aerial) after 1997
 function gable(len,wid,x,y,color){
  const g=new THREE.Mesh(new THREE.CylinderGeometry(wid*0.62,wid*0.62,len,3),
   new THREE.MeshLambertMaterial({color}));
  g.rotation.z=Math.PI/2; g.rotation.x=Math.PI; g.position.set(x,y,0); return g;}
+function gableZ(len,wid,x,z,y,color){
+ const g=new THREE.Mesh(new THREE.CylinderGeometry(wid*0.62,wid*0.62,len,3),
+  new THREE.MeshLambertMaterial({color}));
+ g.rotation.x=Math.PI/2; g.rotation.z=Math.PI; g.position.set(x,y,z); return g;}
 T(bldg,1951);
-const grayRoofs=new THREE.Group(); grayRoofs.add(gable(69,9,-38,8.1,0x5a4a44),gable(17,9,-64,9.5,0x5a4a44)); T(grayRoofs,1951,1997);
-const redRoofs=new THREE.Group();  redRoofs.add(gable(69,9,-38,8.1,0x6e2a24),gable(17,9,-64,9.5,0x6e2a24)); T(redRoofs,1997);
-const bL=label('THE LONG BUILDING — hoist drums, office, P.O. (until 1978)',4.0,'#e8c9a0'); bL.position.set(-38,13,9); T(bL,1951);
+const grayRoofs=new THREE.Group(); grayRoofs.add(gable(59,9,-41,8.1,0x5a4a44),gableZ(16,10,-7,-1,9.6,0x5a4a44)); T(grayRoofs,1951,1997);
+const redRoofs=new THREE.Group();  redRoofs.add(gable(59,9,-41,8.1,0x6e2a24),gableZ(16,10,-7,-1,9.6,0x6e2a24)); T(redRoofs,1997);
+const bL=label('THE LONG BUILDING — office wing + hoist room (P.O. until 1978)',4.0,'#e8c9a0'); bL.position.set(-38,13,9); T(bL,1951);
 
 // landscaping shrubs, modern office era
 for(let i=0;i<6;i++){
@@ -236,14 +241,14 @@ function rope(x1,y1,z1,x2,y2,z2,r){
   new THREE.MeshBasicMaterial({color:0xd8d0c0}));
  m.position.set((x1+x2)/2,(y1+y2)/2,(z1+z2)/2);
  m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir.normalize()); return m;}
-T(rope(-64.5,5.9,4.6, 28.6,28,-0.9),1951,1966);
-T(rope(-63.1,5.9,4.6, 28.6,28, 0.9),1951,1966);
+T(rope(-1.7,5.9,-0.9, 28.6,28,-0.9),1951,1966);
+T(rope(-1.7,5.9, 0.9, 28.6,28, 0.9),1951,1966);
 T(rope(30,28,-0.9,30,1,-0.9),1951,1966);
 T(rope(30,28, 0.9,30,1, 0.9),1951,1966);
-const ropeL=label('THE ROPES — out the wall by the 2nd window, across the yard to the sheaves',3.2,'#d8d0c0'); ropeL.position.set(-16,22,4); T(ropeL,1954,1966);
-const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(-16,20,4); T(endL,1966,1970);
+const ropeL=label('THE ROPES — out of the hoist room, across the yard to the sheaves',3.2,'#d8d0c0'); ropeL.position.set(14,22,4); T(ropeL,1954,1966);
+const endL=label('1966 — the ropes come down',4,'#8b949c'); endL.position.set(14,20,4); T(endL,1966,1970);
 // the service line that still runs to that same corner of the building today (per photo)
-const svc=rope(6,12.5,26, -62.5,7.2,4.7, 0.035); svc.material=new THREE.MeshBasicMaterial({color:0x222426});
+const svc=rope(6,12.5,26, -58,6.8,4.7, 0.035); svc.material=new THREE.MeshBasicMaterial({color:0x222426});
 T(svc,1951);
 const svcPole=new THREE.Mesh(new THREE.CylinderGeometry(0.16,0.22,13,6),new THREE.MeshLambertMaterial({color:0x4a3d30}));
 svcPole.position.set(6,6.5,26); T(svcPole,1951);
@@ -316,7 +321,7 @@ const ERAS=[
  [1930,1944,'The Depression. A bare collar and the wind.'],
  [1944,1951,'Wartime revival — the mill rises; the modern plant takes shape.'],
  [1951,1954,'The brick era: one long building — drums, office, the post office — plus steel headframe, tanks, thickener.'],
- [1954,1966,'All-underground. The ropes leave the wall by the second window, cross the yard day and night; the thickener rakes creep.'],
+ [1954,1966,'All-underground. The ropes leave the hoist room east wall, cross the yard day and night; the thickener rakes creep.'],
  [1966,1978,'1966: the last cage. Ropes still. The thickener fills with rock. The quarry idea stirs (Elder), then the Malloys arrive — and the office becomes a home.'],
  [1978,1997,'★ 1978: the mill burns; the headframe stands. The Malloy quarry years — IMTR thrives around the surviving plant.'],
  [1997,2027,'Weber, then New Frontier, now Martin Marietta. The long building works on as the quarry office; headframe, tanks and thickener ring keep their posts. Nothing here has stopped being useful since 1846.']
@@ -345,7 +350,7 @@ function startWalk(){
   slider.value=1958; setYear(1958);
   walk={i:0,t0:performance.now(),segs:[
    {a:[-56,1.9,96], b:[-44,1.9,64], la:[-38,5,0],  lb:[-38,5,0],  d:7.0, t:'The plant road, 1958. Ahead on your left — two hundred feet of brick under one long roof. Drums, office, the post office.'},
-   {a:[-44,1.9,64], b:[-18,1.9,36], la:[-38,5,0],  lb:[-63.8,6,4],d:7.0, t:'There — the ropes leave the building by the second window from the left and climb across the yard.'},
+   {a:[-44,1.9,64], b:[-18,1.9,36], la:[-38,5,0],  lb:[-2,7,0],d:7.0, t:'There — the ropes leave the hoist room\u2019s east wall, second opening from the left, and cross the yard to the sheaves.'},
    {a:[-18,1.9,36], b:[12,1.9,16],  la:[-63.8,6,4],lb:[30,26,0],  d:7.0, t:'The steel headframe over "B" Shaft. Riveted legs, sheaves turning, rope singing.'},
    {a:[12,1.9,16],  b:[25,1.9,7],   la:[30,26,0],  lb:[30,1.5,0], d:5.5, t:'The collar. Under your boots: 691 feet of cage guides and dark.'},
    {a:[25,1.9,7],   b:[60,34,84],   la:[30,1.5,0], lb:[-2,6,0],   d:5.0, t:'— now take the years.', fly:true}
