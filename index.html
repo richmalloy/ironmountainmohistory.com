@@ -33,6 +33,7 @@
     --ink: #241F1A;
     --ink-faded: #6B6459;
     --oxide: #9C4A24;
+    --oxide-bright: #C9622F;
     --survey-blue: #C98A2B;
     --cable: #33312E;
   }
@@ -197,6 +198,62 @@
     left: -14px;
     top: -34px;
     color: var(--cable);
+  }
+
+  /* sticky horizontal era ruler */
+  .timeline-ruler {
+    position: sticky;
+    top: var(--nav-h, 42px);
+    z-index: 40;
+    background: #26201a;
+    border-top: 1px solid rgba(216,204,180,0.14);
+    border-bottom: 3px double #6e2a1c;
+    margin: 1.5rem 0 2.5rem;
+  }
+  .ruler-track {
+    position: relative;
+    display: flex;
+    max-width: 1080px;
+    margin: 0 auto;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .ruler-track::-webkit-scrollbar { display: none; }
+  .timeline-ruler a {
+    flex: 1 1 0;
+    min-width: 4.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.6rem 0.4rem;
+    text-decoration: none;
+    color: #ab9d81;
+    border-right: 1px solid rgba(216,204,180,0.1);
+    font-family: 'Courier Prime', monospace;
+    transition: color 0.2s ease;
+  }
+  .timeline-ruler a:last-of-type { border-right: none; }
+  .timeline-ruler a .rn {
+    font-family: 'Big Shoulders Display', sans-serif; font-weight: 700;
+    font-size: 1.1rem; color: #d8ccb4;
+  }
+  .timeline-ruler a .ry {
+    font-size: 0.68rem; letter-spacing: 0.08em;
+  }
+  .timeline-ruler a:hover { color: #f0e6d2; }
+  .timeline-ruler a:hover .rn { color: #f4ead6; }
+  .timeline-ruler a.active .rn { color: var(--oxide-bright, #c9622f); }
+  .timeline-ruler a.active .ry { color: #f0e6d2; }
+  .ruler-indicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 4.5rem;
+    background: var(--oxide-bright, #c9622f);
+    transition: left 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s cubic-bezier(0.4,0,0.2,1);
   }
 
   /* era markers along the cable */
@@ -476,13 +533,25 @@
     <h2>The Timeline</h2>
     <p class="section-note">Six eras · sources cited · in progress</p>
 
+    <nav class="timeline-ruler" aria-label="Jump to era">
+      <div class="ruler-track">
+        <a href="#era-1" data-era="1"><span class="rn">I</span><span class="ry">1797</span></a>
+        <a href="#era-2" data-era="2"><span class="rn">II</span><span class="ry">1836</span></a>
+        <a href="#era-3" data-era="3"><span class="rn">III</span><span class="ry">1861</span></a>
+        <a href="#era-4" data-era="4"><span class="rn">IV</span><span class="ry">1870s</span></a>
+        <a href="#era-5" data-era="5"><span class="rn">V</span><span class="ry">1920</span></a>
+        <a href="#era-6" data-era="6"><span class="rn">VI</span><span class="ry">1962</span></a>
+        <div class="ruler-indicator" aria-hidden="true"></div>
+      </div>
+    </nav>
+
     <div class="timeline">
       <svg class="cable-head" width="30" height="30" viewBox="0 0 30 30" aria-hidden="true">
         <path d="M4 28 L15 4 L26 28 M8.5 19 L21.5 19" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="square"/>
       </svg>
 
       <!-- ERA I -->
-      <div class="era-marker">
+      <div class="era-marker" id="era-1">
         <span class="era-num">Era I</span>
         <h3>Origins &amp; Grant · 1797–1836</h3>
         <p class="era-note">The mountain changes hands before anyone digs.</p>
@@ -503,7 +572,7 @@
       </article>
 
       <!-- ERA II -->
-      <div class="era-marker">
+      <div class="era-marker" id="era-2">
         <span class="era-num">Era II</span>
         <h3>Industrial Founding · 1836–1861</h3>
         <p class="era-note">Companies form, fail, and finally take hold. The furnaces light.</p>
@@ -524,7 +593,7 @@
       </article>
 
       <!-- ERA III -->
-      <div class="era-marker">
+      <div class="era-marker" id="era-3">
         <span class="era-num">Era III</span>
         <h3>The War Years · 1861–1865</h3>
         <p class="era-note">The mountain becomes strategic ground.</p>
@@ -545,7 +614,7 @@
       </article>
 
       <!-- ERA IV -->
-      <div class="era-marker">
+      <div class="era-marker" id="era-4">
         <span class="era-num">Era IV</span>
         <h3>Decline &amp; Idle Years · late 1800s–1920</h3>
         <p class="era-note">The easy ore runs out. The mountain waits.</p>
@@ -566,7 +635,7 @@
       </article>
 
       <!-- ERA V -->
-      <div class="era-marker">
+      <div class="era-marker" id="era-5">
         <span class="era-num">Era V</span>
         <h3>The Revival · 1920–1966</h3>
         <p class="era-note">New money, deeper shafts, harder rock — the modern mine.</p>
@@ -609,7 +678,7 @@
       </article>
 
       <!-- ERA VI -->
-      <div class="era-marker">
+      <div class="era-marker" id="era-6">
         <span class="era-num">Era VI</span>
         <h3>The Quarry Era · 1962–present</h3>
         <p class="era-note">The rock itself becomes the product — beginning while the ore was still coming up.</p>
@@ -818,6 +887,52 @@ document.addEventListener('DOMContentLoaded', function () {
     var el = document.getElementById(id);
     if (el) obs.observe(el);
   });
+
+  // sticky era ruler: offset + active tick + sliding indicator
+  var nav = document.querySelector('.sitenav');
+  var ruler = document.querySelector('.timeline-ruler');
+  if (nav) {
+    var setNavH = function () {
+      document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+    };
+    setNavH();
+    window.addEventListener('resize', setNavH);
+  }
+  if (ruler) {
+    var rulerLinks = Array.prototype.slice.call(ruler.querySelectorAll('a[data-era]'));
+    var indicator = ruler.querySelector('.ruler-indicator');
+    var eraEls = rulerLinks.map(function (a) {
+      return document.getElementById('era-' + a.getAttribute('data-era'));
+    });
+    var setActive = function (idx) {
+      rulerLinks.forEach(function (a) { a.classList.remove('active'); });
+      if (idx < 0) return;
+      var a = rulerLinks[idx];
+      a.classList.add('active');
+      if (indicator) {
+        indicator.style.left = a.offsetLeft + 'px';
+        indicator.style.width = a.offsetWidth + 'px';
+      }
+    };
+    if ('IntersectionObserver' in window) {
+      var eraObs = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            var idx = eraEls.indexOf(e.target);
+            if (idx > -1) setActive(idx);
+          }
+        });
+      }, { rootMargin: '-15% 0px -70% 0px' });
+      eraEls.forEach(function (el) { if (el) eraObs.observe(el); });
+    }
+    window.addEventListener('resize', function () {
+      var current = ruler.querySelector('a.active');
+      if (current && indicator) {
+        indicator.style.left = current.offsetLeft + 'px';
+        indicator.style.width = current.offsetWidth + 'px';
+      }
+    });
+  }
 });
 </script>
 </body>
