@@ -203,18 +203,19 @@
   /* sticky horizontal era ruler */
   .timeline-ruler {
     position: sticky;
-    top: var(--nav-h, 42px);
+    bottom: 0;
     z-index: 40;
     background: #26201a;
-    border-top: 1px solid rgba(216,204,180,0.14);
-    border-bottom: 3px double #6e2a1c;
-    margin: 1.5rem 0 2.5rem;
+    border-top: 3px double #6e2a1c;
+    border-bottom: 1px solid rgba(216,204,180,0.14);
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+    margin-right: calc(50% - 50vw);
   }
   .ruler-track {
     position: relative;
     display: flex;
-    max-width: 1080px;
-    margin: 0 auto;
+    width: 100%;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -248,7 +249,7 @@
   .timeline-ruler a.active .ry { color: #f0e6d2; }
   .ruler-indicator {
     position: absolute;
-    bottom: 0;
+    top: 0;
     left: 0;
     height: 3px;
     width: 4.5rem;
@@ -888,16 +889,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (el) obs.observe(el);
   });
 
-  // sticky era ruler: offset + active tick + sliding indicator
-  var nav = document.querySelector('.sitenav');
+  // sticky era ruler: active tick + sliding indicator
   var ruler = document.querySelector('.timeline-ruler');
-  if (nav) {
-    var setNavH = function () {
-      document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
-    };
-    setNavH();
-    window.addEventListener('resize', setNavH);
-  }
   if (ruler) {
     var rulerLinks = Array.prototype.slice.call(ruler.querySelectorAll('a[data-era]'));
     var indicator = ruler.querySelector('.ruler-indicator');
