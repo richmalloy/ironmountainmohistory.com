@@ -154,6 +154,7 @@
 
   /* ---------- Section headings ---------- */
   section { padding: 3.5rem 0 1rem; }
+  #timeline { padding-bottom: 4.5rem; }
 
   h2 {
     font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; letter-spacing: 0.01em;
@@ -202,15 +203,22 @@
 
   /* sticky horizontal era ruler */
   .timeline-ruler {
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
     z-index: 40;
     background: #26201a;
     border-top: 3px double #6e2a1c;
-    border-bottom: 1px solid rgba(216,204,180,0.14);
     width: 100vw;
-    margin-left: calc(50% - 50vw);
-    margin-right: calc(50% - 50vw);
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+  }
+  .timeline-ruler.visible {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
   }
   .ruler-track {
     position: relative;
@@ -925,6 +933,14 @@ document.addEventListener('DOMContentLoaded', function () {
         indicator.style.width = current.offsetWidth + 'px';
       }
     });
+    var timelineSection = document.getElementById('timeline');
+    if (timelineSection && 'IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        ruler.classList.toggle('visible', entries[0].isIntersecting);
+      }, { threshold: 0.02 }).observe(timelineSection);
+    } else {
+      ruler.classList.add('visible');
+    }
   }
 });
 </script>
