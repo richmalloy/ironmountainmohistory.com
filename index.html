@@ -460,6 +460,45 @@
   .foot-links a:hover { color: #f0e6d2; }
   .foot-note { margin-top: 1.1rem; color: #9a8c72; }
 
+  .foot-contact {
+    margin-top: 2rem; padding-top: 1.6rem;
+    border-top: 1px solid rgba(216,204,180,0.14);
+    max-width: 480px;
+  }
+  .foot-contact h3 {
+    font-family: 'Big Shoulders Display', sans-serif; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    font-size: 1.15rem; color: #f0e6d2; margin: 0 0 0.4rem;
+  }
+  .foot-contact p { color: #9a8c72; margin-bottom: 1rem; }
+  .foot-contact label {
+    display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #ab9d81; margin: 0.9rem 0 0.35rem;
+  }
+  .foot-contact input, .foot-contact textarea {
+    width: 100%; box-sizing: border-box;
+    background: #322a20; border: 1px solid rgba(216,204,180,0.22);
+    color: #f0e6d2; padding: 0.6rem 0.7rem;
+    font-family: 'Courier Prime', monospace; font-size: 0.85rem;
+  }
+  .foot-contact input:focus, .foot-contact textarea:focus {
+    outline: 2px solid #c9622f; border-color: transparent;
+  }
+  .foot-contact textarea { min-height: 5.5rem; resize: vertical; }
+  .foot-contact button {
+    margin-top: 1.2rem; padding: 0.65rem 1.4rem;
+    background: #9C4A24; color: #f4ead6; border: none;
+    font-family: 'Courier Prime', monospace; font-weight: bold;
+    font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+    cursor: pointer;
+  }
+  .foot-contact button:hover { background: #C9622F; }
+  .foot-contact .hp-field { position: absolute; left: -9999px; }
+  .foot-contact .form-sent {
+    display: none; color: #d9a06b; margin-top: 1rem;
+    font-size: 0.8rem; letter-spacing: 0.04em;
+  }
+
   /* ---------- Running-header nav ---------- */
   .sitenav {
     position: sticky; top: 0; z-index: 50;
@@ -870,6 +909,23 @@
       <a href="#timeline">Timeline</a><a href="#plates">Plates</a><a href="#landmarks">Landscape</a><a href="#open-questions">Open Questions</a><a href="/resources.html">Resources</a>
     </div>
     <p class="foot-note">Working document — corrections and leads welcome.</p>
+
+    <div class="foot-contact">
+      <h3>Get in touch</h3>
+      <p>Have a correction, a source, a photo, or a lead on any of the open questions above? Send it here.</p>
+      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return imtrContactSubmit(this)">
+        <input type="hidden" name="form-name" value="contact" />
+        <p class="hp-field"><label>Leave this field blank: <input name="bot-field" /></label></p>
+        <label for="cf-name">Name</label>
+        <input id="cf-name" type="text" name="name" required>
+        <label for="cf-email">Email</label>
+        <input id="cf-email" type="email" name="email" required>
+        <label for="cf-message">Message</label>
+        <textarea id="cf-message" name="message" required></textarea>
+        <button type="submit">Send</button>
+        <p class="form-sent" id="cf-sent">Sent — thank you. It'll be read.</p>
+      </form>
+    </div>
   </div>
 </footer>
 
@@ -942,6 +998,22 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 });
+</script>
+<script>
+function imtrContactSubmit(form) {
+  var data = new FormData(form);
+  fetch('/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams(data).toString()
+  }).then(function () {
+    document.getElementById('cf-sent').style.display = 'block';
+    form.reset();
+  }).catch(function () {
+    alert('Something went wrong sending that — please try again in a moment.');
+  });
+  return false;
+}
 </script>
 </body>
 </html>
