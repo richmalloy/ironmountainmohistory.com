@@ -425,7 +425,8 @@
 </style>
 
 <style>
-  .res { border: 1px solid var(--foxing); background: rgba(255,255,255,0.25); padding: 1.1rem 1.25rem; margin: 0 0 1rem; }
+  .res { border: 1px solid var(--foxing); background: rgba(255,255,255,0.25); padding: 1.1rem 1.25rem; margin: 0 0 1rem; scroll-margin-top: 4.5rem; }
+  .res:target { border-color: var(--oxide); background: rgba(156,74,36,0.08); box-shadow: 0 0 0 2px var(--oxide); }
   .res h3 { font-family: 'Crimson Pro', Georgia, serif; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.3rem; }
   .res p { font-size: 1rem; color: var(--ink-faded); }
   .res .how { font-family: 'Courier Prime', monospace; font-size: 0.82rem; color: var(--survey-blue); display: block; margin-top: 0.5rem; }
@@ -485,7 +486,7 @@
       <span class="how">Digitized on HathiTrust (hathitrust.org) — search the title; page-by-page download available.</span>
     </div>
 
-    <div class="res">
+    <div class="res" id="elder-newman">
       <h3>Elder–Newman Correspondence, February–June 1962 (Eric P. Newman Papers)</h3>
       <p>Four letters between Charles B. Elder Jr. — on Trap Rock Material &amp; Engineering Co. / <em>Iron Mountain Trap Rock</em> letterhead — and St. Louis numismatist Eric P. Newman, arranging the appraisal of a coin collection Elder inherited from an uncle. The letterhead is the earliest known documentation of the Iron Mountain Trap Rock name (Feb. 28, 1962; Gretchen K. Elder, president), proving the quarry business predates the 1966 mine closure. Newman's reply records his ca. 1959–60 tour of the Hanna underground workings (“watching the trucks operate underground”), and a May 1962 letter documents a fruitless local search for old Iron Mountain Company scrip.</p>
       <span class="how">Free: <a href="https://archive.org/details/eldercharlesbjr1962epncorr">full scan at archive.org</a> · via the <a href="https://nnp.wustl.edu/library/book/521892">Newman Numismatic Portal</a></span>
@@ -503,19 +504,19 @@
       <span class="how">Free: <a href="https://share.mo.gov/nr/mgs/MGSData/Books/Reports%20of%20Investigations/Guidebook%20to%20the%20Geology%20and%20Ore%20Deposits%20of%20the%20St.%20Francois%20Mountains,%20Missouri/RI-067.pdf">PDF at share.mo.gov</a></span>
     </div>
 
-    <div class="res">
+    <div class="res" id="murphy-ohle">
       <h3>Murphy, J.E. &amp; Ohle, E.L. — "The Iron Mountain Mine," in <em>Ore Deposits of the United States 1933&ndash;1967</em> (AIME, 1968)</h3>
       <p>The closing-era company account of the deposit and mine, by the geologist whose signature appears on the 1961&ndash;62 company map series.</p>
       <span class="how">Access: OneMine.org (membership) or university &amp; MGS Rolla libraries holding AIME volumes.</span>
     </div>
 
-    <div class="res">
+    <div class="res" id="metallogenic-province">
       <h3><em>Mining and Exploration History of the Southeast Missouri Iron Metallogenic Province</em></h3>
       <p>Modern scholarly history of the district, drawing on the Missouri Geological Survey photo archives — including a period photograph of the abandoned Big Cut, early 1900s.</p>
       <span class="how">Available via ResearchGate (researchgate.net) — search the title.</span>
     </div>
 
-    <div class="res">
+    <div class="res" id="edgar-history">
       <h3>Edgar, Judge William R. — "History of Iron Mountain" (local history, ca. 1940s)</h3>
       <p>The richest narrative account of the property: the Pratte grant, Missouri City, company-town life, the Little Mountain cut, the water system, the Smollinger race track, and the Busby&ndash;Hanna revival. The same collection preserves the <em>Lead Belt News</em> account of the September 1923 hoist house fire.</p>
       <span class="how">Free: transcribed at <a href="https://sites.rootsweb.com/~mostfran/mine_history/iron_mountain.htm">RootsWeb — St. Francois County mining history</a></span>
@@ -537,7 +538,7 @@
   <section>
     <h2>The Vaults — Archives &amp; Repositories</h2>
 
-    <div class="res">
+    <div class="res" id="mgs-mine-maps">
       <h3>Missouri Geological Survey — Mine Map Repository (Rolla)</h3>
       <p>Holds sixty-three archived sheets of the Iron Mountain Mine, from an 1886 survey by mining engineer W.E. Potter to the Ozark Ore, Hanna Mining, and Midwest Ore working maps of 1961&ndash;62 — including the December 1961 "Surface Map Showing Plant Site."</p>
       <span class="how">Index: <a href="https://dnrservices.mo.gov/geology/geosrv/geores/mine-maps/">dnrservices.mo.gov — mine maps</a> (township 35N-4E) &middot; High-resolution copies: 573-368-2100</span>
@@ -549,13 +550,13 @@
       <span class="how">Search: <a href="https://s1.sos.mo.gov/records/archives/archivesmvc/provost/">Missouri State Archives provost database</a> (County: Saint Francois)</span>
     </div>
 
-    <div class="res">
+    <div class="res" id="official-records">
       <h3><em>The War of the Rebellion: Official Records</em></h3>
       <p>The government compilation of Union and Confederate records. Series I, Vol. 3 covers the 1861 occupation era; Series I, Vol. 41 (four parts) covers Price's 1864 Missouri Expedition and the Iron Mountain Railroad garrisons.</p>
       <span class="how">Free &amp; full-text searchable: <a href="https://collections.library.cornell.edu/moa_new/waro.html">Cornell — Making of America</a></span>
     </div>
 
-    <div class="res">
+    <div class="res" id="nps-battle-units">
       <h3>National Park Service — Civil War Battle Units</h3>
       <p>Unit service records compiled from Dyer's Compendium — source of the documented movement of the 25th Missouri Infantry to Iron Mountain, March 1863.</p>
       <span class="how">Free: nps.gov/civilwar — Search Battle Units</span>
@@ -577,6 +578,12 @@
       <h3>Mindat — Iron Mountain Mine locality</h3>
       <p>Mineralogical record of the deposit (hematite, magnetite) with historic photographs, including an 1875 illustration and early-1900s mine crew images.</p>
       <span class="how">Free: <a href="https://www.mindat.org/loc-44224.html">mindat.org — locality 44224</a></span>
+    </div>
+
+    <div class="res" id="ownership-2021">
+      <h3>New Frontier Materials Acquires Aggregates &amp; Asphalt Businesses From Fred Weber, Inc. (press release, July 15, 2021)</h3>
+      <p>Fred Weber, Inc. sells its aggregates and asphalt asset portfolio — including the Iron Mountain Trap Rock quarry — to newly formed New Frontier Materials, becoming the founding core of New Frontier's 20+ site Midwest network. Source for the site's modern ownership chain, 1997–present.</p>
+      <span class="how">Free: <a href="https://www.prnewswire.com/news-releases/new-frontier-materials-acquires-aggregates--asphalt-businesses-from-fred-weber-inc-301334322.html">PRNewswire, July 15, 2021</a></span>
     </div>
   </section>
 
