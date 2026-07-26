@@ -433,52 +433,60 @@
 
   /* ---------- Footer ---------- */
   footer {
-    margin-top: 4.5rem;
+    margin-top: 0;
     padding: 2.4rem 0 2.8rem;
-    background: #26201a;                       /* same ink band as the nav */
-    border-top: 3px double #6e2a1c;            /* hematite rule */
+    background: #0f0c09;                       /* near-black, distinct from the contact band above it */
+    border-top: 1px solid rgba(216,204,180,0.1);
     font-family: 'Courier Prime', monospace;
     font-size: 0.8rem;
     letter-spacing: 0.06em;
-    color: #b9ac93;
+    color: #c7bba2;                            /* brightened from #b9ac93 for contrast on near-black */
   }
   footer p + p { margin-top: 0.55em; }
-  footer a { color: #d9a06b; }
+  footer a { color: #e0a874; }                 /* brightened from #d9a06b */
   .foot-brand {
     font-size: 0.95rem; letter-spacing: 0.22em; text-transform: uppercase;
-    color: #f0e6d2; margin-bottom: 0.3rem;
+    color: #f4ead9; margin-bottom: 0.3rem;      /* brightened from #f0e6d2 */
   }
-  .foot-tag { color: #9a8c72; margin-bottom: 1.1rem; }
+  .foot-tag { color: #ab9d81; margin-bottom: 1.1rem; }   /* brightened from #9a8c72 */
   .foot-links {
     margin-top: 1.2rem; padding-top: 1rem;
     border-top: 1px solid rgba(216,204,180,0.14);
   }
   .foot-links a {
-    color: #d8ccb4; text-decoration: none; margin-right: 1.15rem;
+    color: #e0d5bc; text-decoration: none; margin-right: 1.15rem;   /* brightened from #d8ccb4 */
     text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.12em;
   }
   .foot-links a:hover { color: #f0e6d2; }
-  .foot-note { margin-top: 1.1rem; color: #9a8c72; }
+  .foot-note { margin-top: 1.1rem; color: #ab9d81; }     /* brightened from #9a8c72 */
 
-  .foot-contact {
-    margin-top: 2rem; padding-top: 1.6rem;
-    border-top: 1px solid rgba(216,204,180,0.14);
-    max-width: 480px;
+  .foot-contact-band {
+    margin-top: 4.5rem;
+    padding: 2.8rem 0;
+    background: #26201a;                       /* same ink band color as before */
+    border-top: 3px double #6e2a1c;
+    border-bottom: 3px double #6e2a1c;
   }
+  .foot-contact {
+    max-width: 480px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .foot-contact form { text-align: left; }
   .foot-contact h3 {
     font-family: 'Big Shoulders Display', sans-serif; font-weight: 700;
     text-transform: uppercase; letter-spacing: 0.04em;
-    font-size: 1.15rem; color: #f0e6d2; margin: 0 0 0.4rem;
+    font-size: 1.15rem; color: #f4ead9; margin: 0 0 0.4rem;
   }
-  .foot-contact p { color: #9a8c72; margin-bottom: 1rem; }
+  .foot-contact p { color: #ab9d81; margin-bottom: 1rem; }
   .foot-contact label {
     display: block; font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase;
-    color: #ab9d81; margin: 0.9rem 0 0.35rem;
+    color: #b3a68b; margin: 0.9rem 0 0.35rem;
   }
   .foot-contact input, .foot-contact textarea {
     width: 100%; box-sizing: border-box;
     background: #322a20; border: 1px solid rgba(216,204,180,0.22);
-    color: #f0e6d2; padding: 0.6rem 0.7rem;
+    color: #f4ead9; padding: 0.6rem 0.7rem;
     font-family: 'Courier Prime', monospace; font-size: 0.85rem;
   }
   .foot-contact input:focus, .foot-contact textarea:focus {
@@ -495,7 +503,7 @@
   .foot-contact button:hover { background: #C9622F; }
   .foot-contact .hp-field { position: absolute; left: -9999px; }
   .foot-contact .form-sent {
-    display: none; color: #d9a06b; margin-top: 1rem;
+    display: none; color: #e0a874; margin-top: 1rem;
     font-size: 0.8rem; letter-spacing: 0.04em;
   }
 
@@ -899,6 +907,24 @@
 
 </main>
 
+<div class="foot-contact-band">
+  <div class="wrap foot-contact">
+    <h3>Get in touch</h3>
+    <p>Have a correction, a source, a photo, or a lead on any of the open questions above? Send it here.</p>
+    <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return imtrContactSubmit(this)">
+      <input type="hidden" name="form-name" value="contact" />
+      <p class="hp-field"><label>Leave this field blank: <input name="bot-field" /></label></p>
+      <label for="cf-name">Name</label>
+      <input id="cf-name" type="text" name="name" required>
+      <label for="cf-email">Email</label>
+      <input id="cf-email" type="email" name="email" required>
+      <label for="cf-message">Message</label>
+      <textarea id="cf-message" name="message" required></textarea>
+      <button type="submit">Send</button>
+      <p class="form-sent" id="cf-sent">Sent — thank you. It'll be read.</p>
+    </form>
+  </div>
+</div>
 <footer>
   <div class="wrap">
     <p class="foot-brand">Iron Mountain, Missouri — A History</p>
@@ -909,23 +935,6 @@
       <a href="#timeline">Timeline</a><a href="#plates">Plates</a><a href="#landmarks">Landscape</a><a href="#open-questions">Open Questions</a><a href="/resources.html">Resources</a>
     </div>
     <p class="foot-note">Working document — corrections and leads welcome.</p>
-
-    <div class="foot-contact">
-      <h3>Get in touch</h3>
-      <p>Have a correction, a source, a photo, or a lead on any of the open questions above? Send it here.</p>
-      <form name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" onsubmit="return imtrContactSubmit(this)">
-        <input type="hidden" name="form-name" value="contact" />
-        <p class="hp-field"><label>Leave this field blank: <input name="bot-field" /></label></p>
-        <label for="cf-name">Name</label>
-        <input id="cf-name" type="text" name="name" required>
-        <label for="cf-email">Email</label>
-        <input id="cf-email" type="email" name="email" required>
-        <label for="cf-message">Message</label>
-        <textarea id="cf-message" name="message" required></textarea>
-        <button type="submit">Send</button>
-        <p class="form-sent" id="cf-sent">Sent — thank you. It'll be read.</p>
-      </form>
-    </div>
   </div>
 </footer>
 
